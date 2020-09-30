@@ -1,0 +1,238 @@
+= Mongous
+
+またまた新たな mongo ラッパーライブラリ.
+
+== 特徴
+
+* 組込みと標準添付を除いて、mongo driver と bson のみに依存する軽いライブラリである。
+* 項目デフォルト値をブロックで記述できる.
+* 項目制約条件を Array, Range, Proc で記述できる.
+* 保存時および値設定時に制約条件を満たすか検査する.
+
+== 導入
+
+アプリの Gemfile にこの行を追加
+
+[source,ruby]
+----
+gem 'mongous'
+----
+
+それから実行
+
+    $ bundle install
+
+または次のように手動で導入
+
+    $ gem install mongous
+    or
+    $ gem install -l mongous-x.x.x.gem
+
+== 使い方
+
+=== 簡素な定義
+
+[source,ruby]
+----
+require  "mongous"
+
+Mongous.connect!
+
+class Book
+  include  Mongous::Document
+end
+----
+
+=== 詳細な定義
+
+[source,ruby]
+----
+require  "mongous"
+
+Mongous.connect!  ["localhost:27017"], database: "test"
+
+class Book
+  include  Mongous::Document
+
+  field  :title,      String,  :must
+  field  :author,     String
+  field  :publisher,  String
+  field  :style,      String,  ["A4","B5","A5","B6"]
+  field  :price,      Integer, (0..1_000_000)
+  field  :page,       Integer, proc{ page % 4 == 0 }
+  field  :publish_at, Date,    &proc{ Date.today }
+  field  :isbn,       String,  proc{ isbn? }
+  field  :lang,       String,  &proc{ "ja" }
+
+  verify :strict
+  verify do
+    having?(author) | having?(publisher)
+  end
+
+  def isbn?
+    isbn.gsub(/[\D]*/, '').size == 13
+  end
+
+  index  :title
+end
+----
+
+=== ドキュメント作成
+
+[source,ruby]
+----
+book = Book.new
+book.title = "title 1"
+book.price = 1000
+book.style = "A4"
+book.save
+
+book = Book.new( title: "title 2", price: 2000, style: "A5" )
+book.save
+
+doc = { title: "title 3", price: 3000, style: "A6" }
+Book.create( doc )
+----
+
+=== ドキュメント検索
+
+[source,ruby]
+----
+books = Book.all
+pp books
+
+book = Book.filter( title: "title 1" ).first
+p book
+
+books = Book.filter( title: /title/ ).all
+books.each do |book|
+  p book
+end
+
+Book.filter( title: /title/ ).projection( _id: 0 ).each do |book|
+  p book
+end
+
+Book.filter( price: (1..2000), style: ["A4","A5"] ).each do |book|
+  p book
+end
+----
+
+=== ドキュメント更新
+
+[source,ruby]
+----
+book = Book.filter( title: "title 1" ).first
+book.title = "title 1 [update]"
+book.save
+----
+
+=== ドキュメント削除
+
+[source,ruby]
+----
+book = Book.filter( title: "title 1" ).first
+book.delete
+----
+
+== リファレンス
+
+=== デフォルトデータベースに接続する
+
+[source,ruby]
+----
+Mongous.connect!( hosts_or_uri = nil, **opts )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** hosts_or_uri:    ホスト配列または URI (default: ["localhost:21017"])
+  ** opts:            オプション
+    *** file:         データベース構成定義ファイルへのパス
+    *** mode:         実行モード (default: "development")
+    *** database:     データベース名 (default: "test")
+    *** *             Mongo::Client.new のその他オプション引数
+
+=== データベースに接続する
+
+[source,ruby]
+----
+Mongous.connect( hosts_or_uri = nil, **opts )
+----
+
+* Result:
+  ** Mongous::Client.
+
+=== ドキュメントの機能を取り入れる.
+
+[source,ruby]
+----
+include Mongous::Document
+----
+
+=== ドキュメントの要素を定義する.
+
+[source,ruby]
+----
+field( label, *attrs, &block )
+----
+
+* Parameter:
+  ** label:           項目名シンボル
+  ** attrs:           項目属性
+    *** Class:        項目検証用 Class
+    *** Proc:         項目検証用 Proc
+    *** Range:        項目検証用範囲
+    *** Array:        項目検証用配列
+    *** Symbol:       特別な指示子
+      **** must:      ナル値でも空文字列でもない
+  ** block:           デフォルト値を返す
+
+=== 保存や代入の前にドキュメントの要素を検証する.
+
+[source,ruby]
+----
+verify( *syms, &block )
+----
+
+* Parameter:
+  ** syms:            条件シンボル
+    *** strict:       定義済み項目名であることを検証する.
+  ** block:           各項目値を検証して真偽を返す内容を記述する.
+
+=== 索引指定する.
+
+[source,ruby]
+----
+index( *syms, **opts )
+----
+
+* Parameter:
+  ** syms:            項目名シンボル
+  ** opts:            Mongo::Collection#indexes() のオプション.
+
+=== 項目値がナル値でも空文字列でもないことを検証する.
+
+[source,ruby]
+----
+having?( label )
+----
+
+* Result:
+  ** 論理値
+
+* Parameter:
+  ** label:           メソッド呼び出しする項目名.
+
+
+== 貢献
+
+不具合報告とプルリクエストは GitHub https://github.com/arimay/mongous まで. 
+
+== ライセンス
+
+この Gem は、 http://opensource.org/licenses/MIT[MITライセンス] の条件に基づいてオープンソースとして入手できる.
+
+Copyright (c) ARIMA Yasuhiro <arima.yasuhiro@gmail.com>

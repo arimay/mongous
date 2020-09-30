@@ -1,0 +1,15 @@
+
+development:
+  clients:
+    default:
+      database: yml
+      hosts:
+        - localhost:27017
+      options:
+        max_pool_size: 5
+
+production:
+  clients:
+    default:
+      uri: <%= ENV['MONGOLAB_URI'] %>
+

@@ -1,0 +1,239 @@
+= Mongous
+
+Yet another mongo wrapper library.
+
+== Features
+
+* A light library that depends only on the mongo driver and bson, except for built-in and standard attachments.
+* Item default value can be described in the block.
+* Item constraints can be described by Array, Range, and Proc.
+* Checks that constraints are met when saving and setting values.
+
+== Installation
+
+Add this line to your application's Gemfile:
+
+[source,ruby]
+----
+gem 'mongous'
+----
+
+And then execute:
+
+    $ bundle install
+
+Or install it yourself as:
+
+    $ gem install mongous
+    or
+    $ gem install -l mongous-x.x.x.gem
+
+== Usage
+
+=== Simple description
+
+[source,ruby]
+----
+require  "mongous"
+
+Mongous.connect!
+
+class Book
+  include  Mongous::Document
+end
+----
+
+=== Detail declaration
+
+[source,ruby]
+----
+require  "mongous"
+
+Mongous.connect!  ["localhost:27017"], database: "test"
+
+class Book
+  include  Mongous::Document
+
+  field  :title,      String,  :must
+  field  :author,     String
+  field  :publisher,  String
+  field  :style,      String,  ["A4","B5","A5","B6"]
+  field  :price,      Integer, (0..1_000_000)
+  field  :page,       Integer, proc{ page % 4 == 0 }
+  field  :publish_at, Date,    &proc{ Date.today }
+  field  :isbn,       String,  proc{ isbn? }
+  field  :lang,       String,  &proc{ "ja" }
+
+  verify :strict
+  verify do
+    having?(author) | having?(publisher)
+  end
+
+  def isbn?
+    isbn.gsub(/[\D]*/, '').size == 13
+  end
+
+  index  :title
+end
+----
+
+=== Create document
+
+[source,ruby]
+----
+book = Book.new
+book.title = "title 1"
+book.price = 1000
+book.style = "A4"
+book.save
+
+book = Book.new( title: "title 2", price: 2000, style: "A5" )
+book.save
+
+doc = { title: "title 3", price: 3000, style: "A6" }
+Book.create( doc )
+----
+
+=== Search document
+
+[source,ruby]
+----
+books = Book.all
+pp books
+
+book = Book.filter( title: "title 1" ).first
+p book
+
+books = Book.filter( title: /title/ ).all
+books.each do |book|
+  p book
+end
+
+Book.filter( title: /title/ ).projection( _id: 0 ).each do |book|
+  p book
+end
+
+Book.filter( price: (1..2000), style: ["A4","A5"] ).each do |book|
+  p book
+end
+----
+
+=== Update document
+
+[source,ruby]
+----
+book = Book.filter( title: "title 1" ).first
+book.title = "title 1 [update]"
+book.save
+----
+
+=== Delete document
+
+[source,ruby]
+----
+book = Book.filter( title: "title 1" ).first
+book.delete
+----
+
+== Reference
+
+=== Connect default database.
+
+[source,ruby]
+----
+Mongous.connect!( hosts_or_uri = nil, **opts )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** hosts_or_uri:    Array of hosts, or URI (default: ["localhost:21017"])
+  ** opts:            Options.
+    *** file:         Path to database configuration file.
+    *** mode:         Execution mode. (default: "development")
+    *** database:     Database name. (default: "test")
+    *** *             Other optional arguments for Mongo::Client.new.
+
+  ** label:           Field label symbol.
+=== Connect database.
+
+[source,ruby]
+----
+Mongous.connect( hosts_or_uri = nil, **opts )
+----
+
+* Result:
+  ** Mongous::Client.
+
+=== Include document functions.
+
+[source,ruby]
+----
+include Mongous::Document
+----
+
+=== Declare document structure.
+
+[source,ruby]
+----
+field( label, *attrs, &block )
+----
+
+* Parameter:
+  ** label:           Field label symbol.
+  ** attrs:           Field attributes.
+    *** Class:        Class for field verification.
+    *** Proc:         Proc for field verification.
+    *** Range:        Range for field verification.
+    *** Array:        Array for field verification.
+    *** Symbol:       Special delectives.
+      **** must:      Not nil nor empty.
+  ** block:           Returning default value.
+
+=== Verify before save or assignment action.
+
+[source,ruby]
+----
+verify( *syms, &block )
+----
+
+* Parameter:
+  ** syms:            Conditional symbols.
+    *** strict:       Verify that it is a defined item name.
+  ** block:           Describe the content that verifies each item value and returns the truth.
+
+=== Make index.
+
+[source,ruby]
+----
+index( *syms, **opts )
+----
+
+* Parameter:
+  ** syms:            Field label symbols.
+  ** opts:            Options for Mongo::Collection#indexes().
+
+=== Verify field value is not nil nor empty.
+
+[source,ruby]
+----
+having?( label )
+----
+
+* Result:
+  ** Boolean
+
+* Parameter:
+  ** label:           Field label for method call.
+
+
+== Contributing
+
+Bug reports and pull requests are welcome on GitHub at https://github.com/arimay/mongous.
+
+== License
+
+The gem is available as open source under the terms of the http://opensource.org/licenses/MIT[MIT License].
+
+Copyright (c) ARIMA Yasuhiro <arima.yasuhiro@gmail.com>
