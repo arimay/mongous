@@ -6,8 +6,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ["ARIMA Yasuhiro"]
   spec.email         = ["arima.yasuhiro@gmail.com"]
 
-  spec.summary       = %q{ Yet another mongo wrapper library. }
-  spec.description   = %q{ It depends only on mongodb and bson, except for the built-in and standard attachment libraries. }
+  spec.summary       = %q{ Mongo wrapper library. }
+  spec.description   = %q{ Yet another lightweight mongo wrapper library. }
   spec.required_ruby_version = Gem::Requirement.new(">= 2.7.0")
 
   # Specify which files should be added to the gem when it is released.
