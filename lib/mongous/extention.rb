@@ -91,8 +91,8 @@ module Mongous
       end
     end
 
-    def create( **doc )
-      self.new( **doc ).save
+    def create( doc = nil, **hash )
+      self.new( doc || hash ).save
     end
 
     def filter( **_filter )

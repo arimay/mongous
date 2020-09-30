@@ -8,6 +8,11 @@ class Book
 end
 
 
-book  =  Book.new( title: "title basic 1", author: "Alice", style: "A4", price: 1000, page: 100 )
+book  =  Book.new
+book.title  =  "title basic 2"
+book.author  =  "Bob"
+book.style  =  "A5"
+book.price  =  2000
+book.page  =  200
 book.save
 

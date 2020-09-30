@@ -102,12 +102,12 @@ module Mongous
 
     def first
       doc  =  do_find.first
-      @klass.new( **doc )    if doc
+      @klass.new( doc )    if doc
     end
 
     def all
       do_find.map do |doc|
-        @klass.new( **doc )
+        @klass.new( doc )
       end
     end
 

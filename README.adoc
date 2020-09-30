@@ -163,7 +163,7 @@ Mongous.connect( hosts_or_uri = nil, **opts )
 ----
 
 * Result:
-  ** Mongous::Client.
+  ** Mongo::Client.
 
 === Include document functions.
 
