@@ -8,11 +8,14 @@ class Book
 end
 
 
-book  =  Book.first
-p book
+p book  =  Book.first
+puts
+
+pp books  =  Book.all
 puts
 
 Book.each do |book|
   p book
 end
+puts
 

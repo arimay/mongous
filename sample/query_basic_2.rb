@@ -8,11 +8,14 @@ class Book
 end
 
 
-book  =  Book.filter( title: "title 1" ).first
-p book
+p book  =  Book.filter( title: /title/ ).first
+puts
+
+pp books  =  Book.filter( title: /title/ ).all
 puts
 
 Book.filter( title: /title/ ).each do |book|
   p book
 end
+puts
 

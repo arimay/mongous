@@ -91,28 +91,8 @@ module Mongous
       end
     end
 
-    def create( doc = nil, **hash )
-      self.new( doc || hash ).save
-    end
-
-    def filter( **_filter )
-      Filter.new( self ).filter( _filter )
-    end
-
-    def first
-      Filter.new( self ).first
-    end
-
-    def all
-      Filter.new( self ).all
-    end
-
-    def each( &block )
-      Filter.new( self ).each( &block )
-    end
-
-    def delete
-      Filter.new( self ).delete
+    def create( **doc )
+      self.new( **doc ).save
     end
 
     def field( label, *args, **opts, &block )

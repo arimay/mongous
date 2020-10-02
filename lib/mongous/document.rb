@@ -7,9 +7,9 @@ module Mongous
       end
     end
 
-    def initialize( doc = nil, **hash )
+    def initialize( **doc )
       @doc  =  {}
-      (doc || hash).each do |label, value|
+      doc.each do |label, value|
         label  =  label.to_s
         @doc[label]  =  value
       end

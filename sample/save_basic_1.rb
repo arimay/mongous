@@ -9,10 +9,10 @@ end
 
 
 book  =  Book.new
-book.title  =  "title basic 2"
-book.author  =  "Bob"
-book.style  =  "A5"
-book.price  =  2000
-book.page  =  200
+book.title  =  "title basic 1"
+book.author  =  "Alice"
+book.style  =  "A4"
+book.price  =  1000
+book.page  =  100
 book.save
 
