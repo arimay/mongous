@@ -95,6 +95,10 @@ module Mongous
       self.new( **doc ).save
     end
 
+    def find( conditios = {}, options = {} )
+      self.collection.find( conditios, options )
+    end
+
     def field( label, *args, **opts, &block )
       m  =  /(.*?):(\d+)/.match( caller()[0] )
       call_from  =  [ m[1], m[2] ].join(":")

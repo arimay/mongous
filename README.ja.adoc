@@ -91,18 +91,16 @@ book = Book.new( title: "title 2", price: 2000, style: "A5" )
 book.save
 
 doc = { title: "title 3", price: 3000, style: "A6" }
-Book.create( doc )
+Book.create( **doc )
 ----
 
 === ドキュメント検索
 
 [source,ruby]
 ----
-books = Book.all
-pp books
+pp books = Book.all
 
-book = Book.filter( title: "title 1" ).first
-p book
+p book = Book.filter( title: "title 1" ).first
 
 books = Book.filter( title: /title/ ).all
 books.each do |book|
@@ -114,6 +112,23 @@ Book.filter( title: /title/ ).projection( _id: 0 ).each do |book|
 end
 
 Book.filter( price: (1..2000), style: ["A4","A5"] ).each do |book|
+  p book
+end
+
+filter1 = Book.filter( title: /title/ )
+filter2 = Book.filter( price: (1..2000) )
+filter3 = Book.filter( style: ["A4","A5"] )
+Book.not( filter1 ).each do |book|
+  p book
+end
+Book.and( filter1, filter2 ).each do |book|
+  p book
+end
+Book.or( filter1, filter3 ).each do |book|
+  p book
+end
+
+Book.find( {}, { projection: {_id: 0} } ).each do |book|
   p book
 end
 ----
