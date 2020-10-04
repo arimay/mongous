@@ -12,7 +12,7 @@ Book.new( title: "complex 2", author: "Bob",   style: "A5", price: 2000, page: 2
 Book.new( title: "complex 3", author: "Candy", style: "A6", price: 3000, page: 300 ).save
 
 filter1  =  Book.filter( title: /comp/ )
-filter2  =  Book.not( author: /Candy/ )
+filter2  =  Book.not( price: (2000...3000) )
 filter3  =  Book.and( filter1, filter2 ).select( _id: 0 )
 filter4  =  Book.or( filter1, filter2 ).select( _id: 0 )
 p filter1.to_condition

@@ -30,7 +30,7 @@ module Mongous
       filter  ||=  conditions
       condition  =  case filter
       when  Hash
-        filter
+        Filter.new( self ).filter( filter ).to_condition
       when  Filter
         filter.to_condition
       else
