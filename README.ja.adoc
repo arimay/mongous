@@ -128,9 +128,11 @@ Book.or( filter1, filter3 ).each do |book|
   p book
 end
 
-Book.find( {}, { projection: {_id: 0} } ).each do |book|
+Book.find( { title: /title/ }, { projection: {_id: 0} } ).each do |book|
   p book
 end
+
+pp Book.filter( title: /title/ )[0, 5].all
 ----
 
 === ドキュメント更新
@@ -186,6 +188,19 @@ Mongous.connect( hosts_or_uri = nil, **opts )
 ----
 include Mongous::Document
 ----
+
+=== 別のデータベースを割り当てる.
+
+[source,ruby]
+----
+set_client( client )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** client:          Mongo::Client instance.
 
 === ドキュメントの要素を定義する.
 

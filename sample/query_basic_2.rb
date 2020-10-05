@@ -11,6 +11,9 @@ end
 p book  =  Book.filter( title: /title/ ).first
 puts
 
+p count  =  Book.filter( title: /title/ ).count
+puts
+
 pp books  =  Book.filter( title: /title/ ).all
 puts
 

@@ -1,6 +1,10 @@
 
 module Mongous
   module Extention
+    def count
+      self.collection.find.count
+    end
+
     def first
       doc  =  self.collection.find.first
       self.new( **doc )    if doc
@@ -126,51 +130,59 @@ module Mongous
     end
 
     def option( _option )
-      self.option!( _option )
+      @option.merge!( _option )
       self.dup
     end
 
-    def option!( _option )
-      @option.merge!( _option )
-    end
-
     def projection( _projection )
-      self.projection!( _projection )
+      @projection  =  _projection
       self.dup
     end
     alias  :select  :projection
 
-    def projection!( _projection )
-      @projection  =  _projection
-    end
-
     def sort( _sort )
-      self.sort!( _sort )
+      @sort  =  _sort
       self.dup
     end
     alias  :order  :sort
 
-    def sort!( _sort )
-      @sort  =  _sort
-    end
-
     def skip( _skip )
-      self.skip!( _skip )
+      @skip  =  _skip
       self.dup
     end
     alias  :offset  :skip
 
-    def skip!( _skip )
-      @skip  =  _skip
-    end
-
     def limit( _limit )
-      self.limit!( _limit )
+      @limit  =  _limit
       self.dup
     end
 
-    def limit!( _limit )
-      @limit  =  _limit
+    def []( nth_or_range, len = 1 )
+      case  nth_or_range
+      when  Integer
+        raise  Mongous::Error, "invalid nth. :  #{ nth_or_range }"    if  len < 0
+        @skip  =  nth_or_range
+
+        raise  Mongous::Error, "invalid len. :  #{ len }"    if  !len.is_a? Integer || len <= 0
+        @limit  =  len
+
+      when  Range
+        from  =  nth_or_range.begin
+        raise  Mongous::Error, "invalid range. :  #{ nth_or_range }"    unless  from.is_a? Integer
+
+        to    =  nth_or_range.end
+        raise  Mongous::Error, "invalid range. :  #{ nth_or_range }"    unless  to.is_a? Integer
+
+        to  -=  1    if nth_or_range.exclude_end?
+        @skip  =  from
+        @limit  =  to - from + 1
+
+      else
+        raise  Mongous::Error, "invalid class. :  #{ nth_or_range }"
+
+      end
+
+      self.dup
     end
 
     def do_find
@@ -182,6 +194,19 @@ module Mongous
       found  =  found.skip( @skip )    if  @skip
       found  =  found.limit( @limit )    if  @limit
       found
+    end
+
+    def count
+      _count  =  do_find.count
+      if  @skip  &&  @limit
+        [_count - @skip, @limit].min
+      elsif  @skip.nil?  &&  @limit
+        [_count, @limit].min
+      elsif  @skip  &&  @limit.nil?
+        [_count - @skip, 0].max
+      else
+        _count
+      end
     end
 
     def first
