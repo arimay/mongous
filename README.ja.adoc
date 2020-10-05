@@ -180,7 +180,7 @@ Mongous.connect( hosts_or_uri = nil, **opts )
 ----
 
 * Result:
-  ** Mongo::Client.
+  ** Mongo::Client インスタンス.
 
 === ドキュメントの機能を取り入れる.
 
@@ -193,14 +193,27 @@ include Mongous::Document
 
 [source,ruby]
 ----
-set_client( client )
+self.client=( client )
 ----
 
 * Result:
-  ** nil.
+  ** client.
 
 * Parameter:
-  ** client:          Mongo::Client instance.
+  ** client:          Mongo::Client インスタンス.
+
+=== 別のコレクションを割り当てる.
+
+[source,ruby]
+----
+self.collection_name=( collection_name )
+----
+
+* Result:
+  ** collection_name.
+
+* Parameter:
+  ** collection_name: コレクション名.
 
 === ドキュメントの要素を定義する.
 
