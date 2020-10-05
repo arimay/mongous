@@ -5,7 +5,8 @@ $client  =  Mongous.connect
 
 class Book
   include  Mongous::Document
-  set_client  $client
+  self.client  =  $client
+  self.collection_name  =  "Book"
 end
 
 

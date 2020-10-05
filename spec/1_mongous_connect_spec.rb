@@ -26,7 +26,7 @@ RSpec.describe "Mongous::connect" do
   it 'Book1' do
     class Book1
       include Mongous::Document
-      set_client  Mongous::connect
+      self.client  =  Mongous::connect
     end
     expect( Book1.client.class ).to  eq( Mongo::Client )
     expect( Book1.client.database.name ).to  eq( "test" )
@@ -55,7 +55,7 @@ RSpec.describe "Mongous::connect" do
   it 'Book3' do
     class Book3
       include Mongous::Document
-      set_collection_name  "FooBar"
+      self.collection_name  =  "FooBar"
     end
     expect( Book3.client.class ).to  eq( Mongo::Client )
     expect( Book3.client.database.name ).to  eq( "test" )

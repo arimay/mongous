@@ -10,7 +10,7 @@ module Mongous
       end
     end
 
-    def set_client( _client )
+    def client=( _client )
       m  =  /(.*?):(\d+)/.match( caller()[0] )
       call_from  =  [ m[1], m[2] ].join(":")
       if  !_client.is_a?( Mongo::Client )
@@ -28,7 +28,7 @@ module Mongous
       end
     end
 
-    def set_collection_name( _collection_name )
+    def collection_name=( _collection_name )
       self.class_variable_set( :@@collection_name, _collection_name )
       if self.class_variable_defined?( :@@collection )
         self.remove_class_variable( :@@collection )

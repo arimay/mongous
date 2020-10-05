@@ -6,7 +6,8 @@ $client  =  Mongous.connect( file: filepath, mode: ENV["RACK_ENV"] || "developme
 
 class Book
   include  Mongous::Document
-  set_client  $client
+  self.client  =  $client
+  self.collection_name  =  "Book"
 end
 
 
