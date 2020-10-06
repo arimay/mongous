@@ -61,11 +61,11 @@ class Book
   field  :price,      Integer, (0..1_000_000)
   field  :page,       Integer, proc{ page % 4 == 0 }
   field  :isbn,       String,  proc{ isbn? }
-  field  :lang,       String,  default: "ja"
-  field  :created_at, Time,    insert: proc{ Time.now }
+  field  :lang,       String,  default: "en"
+  field  :created_at, Time,    create: proc{ Time.now }
   field  :updated_at, Time,    update: proc{ Time.now }
 
-  filter :titlefilter,  {title: /foobar/}
+  filter :foobar,     {title: /foobar/}
 
   verify :strict
   verify do
@@ -119,16 +119,17 @@ Book.where( price: (1..2000), style: ["A4","A5"] ).each do |book|
 end
 
 filter1 = Book.where( title: /title/ )
-filter2 = Book.not( title: /foobar/ )
+filter2 = Book.where( :foobar )
 filter3 = Book.where( price: (1..2000) )
 filter4 = Book.where( style: ["A4","A5"] )
+
 Book.not( filter1 ).each do |book|
   p book
 end
-Book.and( filter1, filter2 ).each do |book|
+Book.and( filter1, filter3 ).each do |book|
   p book
 end
-Book.or( filter1, filter3 ).each do |book|
+Book.or( filter2, filter4 ).each do |book|
   p book
 end
 
