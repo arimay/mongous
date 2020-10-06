@@ -234,7 +234,7 @@ field( symbol, *attrs, **items )
       **** must:      Not nil nor empty.
   ** items:           Operation when saving.
     *** default:      Value or proc when undefined.
-    *** insert:       Value or proc when saving a new document.
+    *** create:       Value or proc when saving a new document.
     *** update:       Value or proc when saving update document.
 
 === Verify before save or assignment action.
