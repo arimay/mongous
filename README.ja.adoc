@@ -163,7 +163,7 @@ book.delete
 
 [source,ruby]
 ----
-Mongous.connect!( hosts_or_uri = nil, **opts )
+Mongous.connect!( hosts_or_uri = nil, **options )
 ----
 
 * Result:
@@ -171,17 +171,17 @@ Mongous.connect!( hosts_or_uri = nil, **opts )
 
 * Parameter:
   ** hosts_or_uri:    ホスト配列または URI (default: ["localhost:21017"])
-  ** opts:            オプション
+  ** options:         オプション
     *** file:         データベース構成定義ファイルへのパス
     *** mode:         実行モード (default: "development")
     *** database:     データベース名 (default: "test")
-    *** *             Mongo::Client.new のその他オプション引数
+    ***               Mongo::Client.new のその他オプション引数
 
 === データベースに接続する
 
 [source,ruby]
 ----
-Mongous.connect( hosts_or_uri = nil, **opts )
+Mongous.connect( hosts_or_uri = nil, **options )
 ----
 
 * Result:
