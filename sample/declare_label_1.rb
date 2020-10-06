@@ -21,7 +21,7 @@ end
 
 
 book  =  Book.new
-book.title       =  "title label"
+book.title       =  "declare label"
 book.author      =  "foobar"
 book.publisher   =  nil
 book.style       =  "A5"

@@ -26,31 +26,56 @@ module Mongous
       end
     end
 
-    def having?( value )
-      case  value
+    def having?( label )
+      case  label
       when  NilClass
         false
       when  String
-        !value.strip.empty?
+        !label.strip.empty?
       else
         true
       end
     end
 
+    def getvalue_or_callproc( value_or_proc )
+      case  value_or_proc
+      when  Proc
+        value_or_proc.call
+      else
+        value_or_proc
+      end
+    end
+
     def save
+      if  @doc["_id"].nil? || self.class.collection.find( { "_id"=> @doc["_id"] } ).count == 0
+        savemode  =  :create
+      else
+        savemode  =  :update
+      end
       self.class.fields.each do |label, field|
-        _must  =  field[:_args].include?(:must)
+        _must  =  field[:_attrs].include?(:must)
         if  @doc.has_key?(label)
           if  _must  &&  !having?( @doc[label] )
             raise  Mongous::Error, "must and not having field. : #{ label }"
           end
         else
-          if  block  =  field[:_block]
-            self[label]  =  block.call
+          if  default_value  =  getvalue_or_callproc( field[:default] )
+            self[label]  =  default_value
           elsif  _must
             raise  Mongous::Error, "must and unassigned field. : #{ label }"
           elsif  self.class.symbols[:strict]
             self[label]  =  nil
+          end
+        end
+
+        case  savemode
+        when  :create
+          if  create_value  =  getvalue_or_callproc( field[:create] )
+            self[label]  =  create_value
+          end
+        when  :update
+          if  update_value  =  getvalue_or_callproc( field[:update] )
+            self[label]  =  update_value
           end
         end
       end
@@ -61,15 +86,13 @@ module Mongous
         end
       end
 
-      if  @doc["_id"]
-        _filter  =  { "_id"=> @doc["_id"] }
-        if  self.class.collection.find( _filter ).first
-          self.class.collection.update_one( _filter, { '$set' => @doc } )
-          return  self
-        end
+      case  savemode
+      when  :create
+        self.class.collection.insert_one( @doc )
+      when  :update
+        self.class.collection.update_one( { "_id"=> @doc["_id"] }, { '$set' => @doc } )
       end
 
-      self.class.collection.insert_one( @doc )
       self
     end
 
@@ -108,18 +131,18 @@ module Mongous
       return  @doc[label]  =  value    if field.nil?
 
       types  =  []
-      if  args  =  field[:_args]  ||  []
-        args.each do |arg|
-          if  arg.class == Class
-            types  <<  arg
-            args  -=  [arg]
+      if  attrs  =  field[:_attrs]  ||  []
+        attrs.each do |attr|
+          if  attr.class == Class
+            types  <<  attr
+            attrs  -=  [attr]
             break
           end
         end
       end
 
       if  !types.empty?
-        if  !(args & [:must, :not_null]).empty?
+        if  !(attrs & [:must, :not_null]).empty?
           if  !types.include?( value.class )
             raise  Mongous::Error, "invalid type. : #{ label } : #{ value.class }"
           end
@@ -129,7 +152,7 @@ module Mongous
           end
         end
       else
-        if  !(args & [:must, :not_null]).empty?
+        if  !(attrs & [:must, :not_null]).empty?
           if  [NilClass].include?( value.class )
             raise  Mongous::Error, "invalid type. : #{ label } : #{ value.class }"
           end
@@ -138,19 +161,19 @@ module Mongous
 
       @doc[label]  =  value
 
-      args.each do |arg|
-        case  arg
+      attrs.each do |attr|
+        case  attr
         when  Proc
-          if  !self.instance_eval( &arg )
+          if  !self.instance_eval( &attr )
             raise  Mongous::Error, "violation detected. : #{ label } : #{ value }"
           end
         when  Array
-          if  !arg.include?( value )
-            raise  Mongous::Error, "not include. : #{ label } :#{ value }"
+          if  !attr.include?( value )
+            raise  Mongous::Error, "not include. : #{ label } : #{ value }"
           end
         when  Range
-          if  !arg.cover?( value )
-            raise  Mongous::Error, "out of range. : #{ label } :#{ value }"
+          if  !attr.cover?( value )
+            raise  Mongous::Error, "out of range. : #{ label } : #{ value }"
           end
         end
       end

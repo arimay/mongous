@@ -60,9 +60,12 @@ class Book
   field  :style,      String,  ["A4","B5","A5","B6"]
   field  :price,      Integer, (0..1_000_000)
   field  :page,       Integer, proc{ page % 4 == 0 }
-  field  :publish_at, Date,    &proc{ Date.today }
   field  :isbn,       String,  proc{ isbn? }
-  field  :lang,       String,  &proc{ "ja" }
+  field  :lang,       String,  default: "ja"
+  field  :created_at, Time,    insert: proc{ Time.now }
+  field  :updated_at, Time,    update: proc{ Time.now }
+
+  filter :titlefilter,  {title: /foobar/}
 
   verify :strict
   verify do
@@ -100,24 +103,25 @@ Book.create( **doc )
 ----
 pp books = Book.all
 
-p book = Book.filter( title: "title 1" ).first
+p book = Book.where( title: "title 1" ).first
 
-books = Book.filter( title: /title/ ).all
+books = Book.where( title: /title/ ).all
 books.each do |book|
   p book
 end
 
-Book.filter( title: /title/ ).projection( _id: 0 ).each do |book|
+Book.where( title: /title/ ).projection( _id: 0 ).each do |book|
   p book
 end
 
-Book.filter( price: (1..2000), style: ["A4","A5"] ).each do |book|
+Book.where( price: (1..2000), style: ["A4","A5"] ).each do |book|
   p book
 end
 
-filter1 = Book.filter( title: /title/ )
-filter2 = Book.filter( price: (1..2000) )
-filter3 = Book.filter( style: ["A4","A5"] )
+filter1 = Book.where( title: /title/ )
+filter2 = Book.not( title: /foobar/ )
+filter3 = Book.where( price: (1..2000) )
+filter4 = Book.where( style: ["A4","A5"] )
 Book.not( filter1 ).each do |book|
   p book
 end
@@ -132,14 +136,14 @@ Book.find( { title: /title/ }, { projection: {_id: 0} } ).each do |book|
   p book
 end
 
-pp Book.filter( title: /title/ )[0, 5].all
+pp Book.where( title: /title/ )[0, 5].all
 ----
 
 === ドキュメント更新
 
 [source,ruby]
 ----
-book = Book.filter( title: "title 1" ).first
+book = Book.where( title: "title 1" ).first
 book.title = "title 1 [update]"
 book.save
 ----
@@ -148,7 +152,7 @@ book.save
 
 [source,ruby]
 ----
-book = Book.filter( title: "title 1" ).first
+book = Book.where( title: "title 1" ).first
 book.delete
 ----
 
@@ -197,7 +201,7 @@ self.client=( client )
 ----
 
 * Result:
-  ** client.
+  ** Mongo::Client インスタンス.
 
 * Parameter:
   ** client:          Mongo::Client インスタンス.
@@ -210,7 +214,7 @@ self.collection_name=( collection_name )
 ----
 
 * Result:
-  ** collection_name.
+  ** Collection name 文字列.
 
 * Parameter:
   ** collection_name: コレクション名.
@@ -219,11 +223,11 @@ self.collection_name=( collection_name )
 
 [source,ruby]
 ----
-field( label, *attrs, &block )
+field( symbol, *attrs, **items )
 ----
 
 * Parameter:
-  ** label:           項目名シンボル
+  ** symbol:          項目名
   ** attrs:           項目属性
     *** Class:        項目検証用 Class
     *** Proc:         項目検証用 Proc
@@ -231,17 +235,20 @@ field( label, *attrs, &block )
     *** Array:        項目検証用配列
     *** Symbol:       特別な指示子
       **** must:      ナル値でも空文字列でもない
-  ** block:           デフォルト値を返す
+  ** items:           保存時の操作.
+    *** default:      未定義のときの値または Proc.
+    *** insert:       ドキュメントを新規保存するときの値または Proc.
+    *** update:       ドキュメントを更新するときの値または Proc.
 
 === 保存や代入の前にドキュメントの要素を検証する.
 
 [source,ruby]
 ----
-verify( *syms, &block )
+verify( *directives, &block )
 ----
 
 * Parameter:
-  ** syms:            条件シンボル
+  ** directives:      条件シンボル
     *** strict:       定義済み項目名であることを検証する.
   ** block:           各項目値を検証して真偽を返す内容を記述する.
 
@@ -249,12 +256,12 @@ verify( *syms, &block )
 
 [source,ruby]
 ----
-index( *syms, **opts )
+index( *symbols, **options )
 ----
 
 * Parameter:
-  ** syms:            項目名シンボル
-  ** opts:            Mongo::Collection#indexes() のオプション.
+  ** symbols:         項目名
+  ** options:         Mongo::Collection#indexes() のオプション.
 
 === 項目値がナル値でも空文字列でもないことを検証する.
 
@@ -269,6 +276,70 @@ having?( label )
 * Parameter:
   ** label:           メソッド呼び出しする項目名.
 
+=== 検索条件に名前をつける.
+
+[source,ruby]
+----
+filter( symbol, filter_or_cond )
+----
+
+* Parameter:
+  ** symbol:          項目名
+  ** filter_or_cond:  フィルタまたは検索条件
+
+=== 検索条件.
+
+[source,ruby]
+----
+where( filter = nil, **conditions )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filter:          項目名またはフィルタインスタンス
+  ** conditions:      検索条件
+
+=== 否定検索条件.
+
+[source,ruby]
+----
+not( filter = nil, **conditions )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filter:          項目名またはフィルタインスタンス
+  ** conditions:      検索条件
+
+=== 論理積検索条件.
+
+[source,ruby]
+----
+and( *filters )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filters:         項目名またはフィルタインスタンス
+
+=== 論理和検索条件.
+
+[source,ruby]
+----
+or( *filters )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filters:         項目名またはフィルタインスタンス
 
 == 貢献
 

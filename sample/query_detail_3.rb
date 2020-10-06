@@ -12,9 +12,10 @@ class Book
   field  :style,                %w[ A4 A5 A6 ]
   field  :price,      Integer,  (0..1_000_000)
   field  :page,       Integer,  proc{ page > 0 }
-  field  :publish_at, Date,     &proc{ Date.today }
   field  :isbn,                 proc{ isbn? }
-  field  :lang,                 &proc{ "ja" }
+  field  :lang,                 default: "en"
+  field  :created_at, Time,     create: ->(){ Time.now }
+  field  :updated_at, Time,     update: ->(){ Time.now }
 
   verify :strict
 

@@ -7,11 +7,14 @@ class Book
   include  Mongous::Document
 end
 
-Book.new( title: "complex 1", author: "Alice", style: "A4", price: 1000, page: 100 ).save
-Book.new( title: "complex 2", author: "Bob",   style: "A5", price: 2000, page: 200 ).save
-Book.new( title: "complex 3", author: "Candy", style: "A6", price: 3000, page: 300 ).save
+(1..3).each do |n|
+  unless  Book.where( title: "complex #{n}" ).first
+    Book.create( title: "complex #{n}", author: (0x40 + n).chr, style: "A#{n + 3}", price: n * 1000, page: n * 100 )
+  end
+end
+puts
 
-filter1  =  Book.filter( title: /comp/ )
+filter1  =  Book.where( title: /comp/ )
 filter2  =  Book.not( price: (2000...3000) )
 filter3  =  Book.and( filter1, filter2 ).select( _id: 0 )
 filter4  =  Book.or( filter1, filter2 ).select( _id: 0 )

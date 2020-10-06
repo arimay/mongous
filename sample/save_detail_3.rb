@@ -12,9 +12,10 @@ class Book
   field  :style,                %w[ A4 A5 A6 ]
   field  :price,      Integer,  (0..1_000_000)
   field  :page,       Integer,  proc{ page > 0 }
-  field  :publish_at, Date,     &proc{ Date.today }
   field  :isbn,                 proc{ isbn? }
-  field  :lang,                 &proc{ "ja" }
+  field  :lang,                 default: "en"
+  field  :created_at, Time,     create: ->(){ Time.now }
+  field  :updated_at, Time,     update: ->(){ Time.now }
 
   verify :strict
 
@@ -25,16 +26,16 @@ class Book
   end
 end
 
-
 book  =  Book.new
 book.title  =  "title detail 3"
 book.author  =  "Candy"
-#book.publisher  =  "Foobar"
+#book.publisher
 book.style  =  "A6"
 book.price  =  3000
 book.page  =  300
-#book.publish_at  =  Date.today
 book.isbn  =  "978-3-16-148410-0"
 #book.lang
+#book.created_at
+#book.updated_at
 book.save
 

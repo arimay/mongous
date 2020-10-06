@@ -9,7 +9,7 @@ end
 
 
 book  =  Book.new
-book.title       =  "title compact"
+book.title       =  "declare compact"
 book.author      =  "foobar"
 book.publisher   =  nil
 book.style       =  "A4"

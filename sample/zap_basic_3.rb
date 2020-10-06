@@ -7,5 +7,5 @@ class Book
   include  Mongous::Document
 end
 
-Book.filter( title: /title/ ).delete
+Book.where( title: /title/ ).delete
 

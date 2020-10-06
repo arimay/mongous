@@ -8,7 +8,7 @@ class Book
 
   field  :title,        :must
   field  :page,         Integer,  proc{ page > 1 }
-  field  :price,        Integer,  proc{ (price > 0) & (price < 10_000) }
+  field  :price,        Integer,  proc{ (price > 0) && (price < 10_000) }
 
 end
 

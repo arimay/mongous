@@ -60,34 +60,34 @@ module Mongous
     end
 
     def fields
-      if self.class_variable_defined?( :@@fields )
-        self.class_variable_get( :@@fields )
-      else
-        self.class_variable_set( :@@fields, {} )
-      end
+      self_class_variable( :@@fields, {} )
     end
 
     def symbols
-      if self.class_variable_defined?( :@@symbols )
-        self.class_variable_get( :@@symbols )
-      else
-        self.class_variable_set( :@@symbols, {} )
-      end
+      self_class_variable( :@@symbols, {} )
     end
 
     def blocks
-      if self.class_variable_defined?( :@@blocks )
-        self.class_variable_get( :@@blocks )
-      else
-        self.class_variable_set( :@@blocks, {} )
-      end
+      self_class_variable( :@@blocks, {} )
     end
 
     def indexes
-      if self.class_variable_defined?( :@@indexes )
-        self.class_variable_get( :@@indexes )
+      self_class_variable( :@@indexes, [] )
+    end
+
+    def filters
+      self_class_variable( :@@filters, {} )
+    end
+
+    def defaults
+      self_class_variable( :@@defaults, {} )
+    end
+
+    def self_class_variable( symbol, default )
+      if self.class_variable_defined?( symbol )
+        self.class_variable_get( symbol )
       else
-        self.class_variable_set( :@@indexes, [] )
+        self.class_variable_set( symbol, default )
       end
     end
 
@@ -99,38 +99,32 @@ module Mongous
       self.collection.find( conditios, options )
     end
 
-    def field( label, *args, **opts, &block )
+    def field( symbol, *attrs, **items )
       m  =  /(.*?):(\d+)/.match( caller()[0] )
       call_from  =  [ m[1], m[2] ].join(":")
 
-      args.each do |arg|
-        if klass  =  arg.class 
+      attrs.each do |attr|
+        if klass  =  attr.class 
           if ![Class, Range, Array, Proc, Symbol].include?(klass)
-            raise  Mongous::Error, "field error. :  #{arg} on #{ label } at #{ call_from }"
+            raise  Mongous::Error, "field args error. : #{ attr } on #{ symbol } at #{ call_from }"
           end
         end
       end
 
-      opts.each do |key, value|
-        case  key
-        when  :default
-          case  value
-          when  Proc, String, Numeric
-          else
-            raise  Mongous::Error, "field error. : #{key} on #{ label } at #{ call_from }"
-          end
-        end
+      items.each do |key, value|
+        next    if [:default, :create, :update].include?(key) && [Proc, String, Numeric].include?(value.class)
+
+        raise  Mongous::Error, "field opts error. : #{key} on #{ symbol } at #{ call_from }"
       end
 
-      opts[:_args]  =  args
-      opts[:_block]  =  block
-      fields[label.to_s]  =  opts
+      items[:_attrs]  =  attrs
+      fields[symbol.to_s]  =  items
     end
 
-    def verify( *syms, &block )
-      if !syms.empty?
-        syms.each do |sym|
-          symbols[sym]  =  true
+    def verify( *directives, &block )
+      if !directives.empty?
+        directives.each do |directive|
+          symbols[directive]  =  true
         end
       elsif block
         m  =  /(.*?):(\d+)/.match( caller()[0] )
@@ -139,13 +133,26 @@ module Mongous
       end
     end
 
-    def index( *syms, **opts )
-      opts[:background]  =  true    unless opts.has_key?(:background)
+    def index( *symbols, **options )
+      options[:background]  =  true    unless  options.has_key?(:background)
       keys  =  {}
-      syms.each do |sym|
-        keys[sym]  =  1
+      symbols.each do |symbol|
+        keys[symbol]  =  1
       end
-      indexes.push  <<  [keys, opts]
+      indexes.push  <<  [keys, options]
+    end
+
+    def filter( symbol, filter_or_condition )
+      case  filter_or_condition
+      when  Filter
+        filters[symbol]  =  filter_or_condition.to_condition
+      when  Hash
+        filters[symbol]  =  filter_or_condition
+      else
+        m  =  /(.*?):(\d+)/.match( caller()[0] )
+        call_from  =  [ m[1], m[2] ].join(":")
+        raise  Mongous::Error, "filter error. : #{symbol}, #{filter_or_condition} at #{ call_from }"
+      end
     end
   end
 end

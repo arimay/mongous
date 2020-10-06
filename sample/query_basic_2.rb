@@ -7,17 +7,16 @@ class Book
   include  Mongous::Document
 end
 
-
-p book  =  Book.filter( title: /title/ ).first
+p book  =  Book.where( title: /title/ ).first
 puts
 
-p count  =  Book.filter( title: /title/ ).count
+p count  =  Book.where( title: /title/ ).count
 puts
 
-pp books  =  Book.filter( title: /title/ ).all
+pp books  =  Book.where( title: /title/ ).all
 puts
 
-Book.filter( title: /title/ ).each do |book|
+Book.where( title: /title/ ).each do |book|
   p book
 end
 puts

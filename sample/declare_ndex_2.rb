@@ -23,7 +23,7 @@ end
 
 
 book  =  Book.new
-book.title       =  "title strict"
+book.title       =  "declare index 2"
 book.author      =  "foobar"
 book.publisher   =  nil
 book.style       =  "A6"

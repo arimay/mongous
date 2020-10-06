@@ -24,55 +24,53 @@ module Mongous
       self.collection.delete_many({})
     end
 
-    def filter( **conditions )
-      Filter.new( self ).filter( conditions )
+    def where( filter = nil, **conditions )
+      condition  =  normalize( filter, conditions )
+      Filter.new( self ).where( condition )
     end
 
     def not( filter = nil, **conditions )
       raise  Mongous::Error, "Unset args for #{self}.not."    if filter.nil? && conditions.empty?
 
-      filter  ||=  conditions
-      condition  =  case filter
-      when  Hash
-        Filter.new( self ).filter( filter ).to_condition
-      when  Filter
-        filter.to_condition
-      else
-        raise  Mongous::Error, "Invalid args for #{self}.not. : #{filter}"
-      end
-      Filter.new( self ).filter({"$nor" => [condition]})
+      condition  =  normalize( filter, conditions )
+      Filter.new( self ).where({"$nor" => [condition]})
     end
 
     def and( *filters )
       raise  Mongous::Error, "Unset args for #{self}.and."    if filters.empty?
 
       conditions  =  filters.map do |filter|
-        case  filter
-        when  Hash
-          filter
-        when  Filter
-          filter.to_condition
-        else
-          raise  Mongous::Error, "Invalid args for #{self}.and. : #{filter}"
-        end
+        normalize( filter, {} )
       end
-      Filter.new( self ).filter({"$and" => conditions})
+      Filter.new( self ).where({"$and" => conditions})
     end
 
     def or( *filters )
       raise  Mongous::Error, "Unset args for #{self}.or."    if filters.empty?
 
       conditions  =  filters.map do |filter|
-        case  filter
-        when  Hash
-          filter
-        when  Filter
-          filter.to_condition
-        else
-          raise  Mongous::Error, "Invalid args for #{self}.or. : #{filter}"
-        end
+        normalize( filter, {} )
       end
-      Filter.new( self ).filter({"$or" => conditions})
+      Filter.new( self ).where({"$or" => conditions})
+    end
+
+    def normalize( filter, conditions )
+      condition  =  case  filter
+      when  Filter
+        filter.to_condition
+      when  Symbol
+        case  _filter  =  filters[filter]
+        when  Filter
+          _filter.to_condition
+        when  Hash
+          _filter
+        end
+      when  NilClass
+        Filter.new( self ).where( **conditions ).to_condition
+      else
+        caller_method  =  /`(.*?)'/.match( caller()[0] )[1]
+        raise  Mongous::Error, "Invalid args for #{self}.#{ caller_method }. : #{filter}, #{conditions}"
+      end
     end
   end
 end
@@ -85,7 +83,7 @@ module Mongous
       @option  =  {}
     end
 
-    def filter( conditions )
+    def where( conditions )
       hash  =  {}
       conditions.each do |key, item|
         case  key
@@ -146,25 +144,15 @@ module Mongous
     end
     alias  :order  :sort
 
-    def skip( _skip )
-      @skip  =  _skip
-      self.dup
-    end
-    alias  :offset  :skip
-
-    def limit( _limit )
-      @limit  =  _limit
-      self.dup
-    end
-
-    def []( nth_or_range, len = 1 )
+    def []( nth_or_range, len = nil )
       case  nth_or_range
       when  Integer
-        raise  Mongous::Error, "invalid nth. :  #{ nth_or_range }"    if  len < 0
         @skip  =  nth_or_range
 
-        raise  Mongous::Error, "invalid len. :  #{ len }"    if  !len.is_a? Integer || len <= 0
-        @limit  =  len
+        if  len
+          raise  Mongous::Error, "invalid len. :  #{ len }"    if  !len.is_a? Integer || len <= 0
+          @limit  =  len
+        end
 
       when  Range
         from  =  nth_or_range.begin
@@ -198,14 +186,20 @@ module Mongous
 
     def count
       _count  =  do_find.count
-      if  @skip  &&  @limit
-        [_count - @skip, @limit].min
-      elsif  @skip.nil?  &&  @limit
-        [_count, @limit].min
-      elsif  @skip  &&  @limit.nil?
-        [_count - @skip, 0].max
+      if  @skip
+        if  @skip > _count
+          0
+        elsif  @limit
+          [_count - @skip, @limit].min
+        else
+          _count - @skip
+        end
       else
-        _count
+        if  @limit
+          [_count, @limit].min
+        else
+          _count
+        end
       end
     end
 

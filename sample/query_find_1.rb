@@ -7,7 +7,6 @@ class Book
   include  Mongous::Document
 end
 
-
 p book  =  Book.find.first
 puts
 

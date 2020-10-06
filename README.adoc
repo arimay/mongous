@@ -60,9 +60,10 @@ class Book
   field  :style,      String,  ["A4","B5","A5","B6"]
   field  :price,      Integer, (0..1_000_000)
   field  :page,       Integer, proc{ page % 4 == 0 }
-  field  :publish_at, Date,    &proc{ Date.today }
   field  :isbn,       String,  proc{ isbn? }
-  field  :lang,       String,  &proc{ "ja" }
+  field  :lang,       String,  default: "ja"
+  field  :created_at, Time,    insert: proc{ Time.now }
+  field  :updated_at, Time,    update: proc{ Time.now }
 
   verify :strict
   verify do
@@ -100,24 +101,24 @@ Book.create( **doc )
 ----
 pp books = Book.all
 
-p book = Book.filter( title: "title 1" ).first
+p book = Book.where( title: "title 1" ).first
 
-books = Book.filter( title: /title/ ).all
+books = Book.where( title: /title/ ).all
 books.each do |book|
   p book
 end
 
-Book.filter( title: /title/ ).projection( _id: 0 ).each do |book|
+Book.where( title: /title/ ).projection( _id: 0 ).each do |book|
   p book
 end
 
-Book.filter( price: (1..2000), style: ["A4","A5"] ).each do |book|
+Book.where( price: (1..2000), style: ["A4","A5"] ).each do |book|
   p book
 end
 
-filter1 = Book.filter( title: /title/ )
-filter2 = Book.filter( price: (1..2000) )
-filter3 = Book.filter( style: ["A4","A5"] )
+filter1 = Book.where( title: /title/ )
+filter2 = Book.where( price: (1..2000) )
+filter3 = Book.where( style: ["A4","A5"] )
 Book.not( filter1 ).each do |book|
   p book
 end
@@ -132,14 +133,14 @@ Book.find( { title: /title/ }, { projection: {_id: 0} } ).each do |book|
   p book
 end
 
-pp Book.filter( title: /title/ )[0, 5].all
+pp Book.where( title: /title/ )[0, 5].all
 ----
 
 === Update document
 
 [source,ruby]
 ----
-book = Book.filter( title: "title 1" ).first
+book = Book.where( title: "title 1" ).first
 book.title = "title 1 [update]"
 book.save
 ----
@@ -148,7 +149,7 @@ book.save
 
 [source,ruby]
 ----
-book = Book.filter( title: "title 1" ).first
+book = Book.where( title: "title 1" ).first
 book.delete
 ----
 
@@ -193,11 +194,11 @@ include Mongous::Document
 
 [source,ruby]
 ----
-self.client=( client )
+self.client=( _client )
 ----
 
 * Result:
-  ** client.
+  ** Mongo::Client instance.
 
 * Parameter:
   ** client:          Mongo::Client instance.
@@ -206,11 +207,11 @@ self.client=( client )
 
 [source,ruby]
 ----
-self.collection_name=( collection_name )
+self.collection_name=( _collection_name )
 ----
 
 * Result:
-  ** collection_name.
+  ** Collection name string.
 
 * Parameter:
   ** collection_name: Collection name.
@@ -219,29 +220,32 @@ self.collection_name=( collection_name )
 
 [source,ruby]
 ----
-field( label, *attrs, &block )
+field( symbol, *attrs, **items )
 ----
 
 * Parameter:
-  ** label:           Field label symbol.
+  ** symbol:          Field name.
   ** attrs:           Field attributes.
     *** Class:        Class for field verification.
     *** Proc:         Proc for field verification.
     *** Range:        Range for field verification.
     *** Array:        Array for field verification.
-    *** Symbol:       Special delectives.
+    *** Symbol:       Special directive symbol.
       **** must:      Not nil nor empty.
-  ** block:           Returning default value.
+  ** items:           Operation when saving.
+    *** default:      Value or proc when undefined.
+    *** insert:       Value or proc when saving a new document.
+    *** update:       Value or proc when saving update document.
 
 === Verify before save or assignment action.
 
 [source,ruby]
 ----
-verify( *syms, &block )
+verify( *directives, &block )
 ----
 
 * Parameter:
-  ** syms:            Conditional symbols.
+  ** directives:      Special directive symbol.
     *** strict:       Verify that it is a defined item name.
   ** block:           Describe the content that verifies each item value and returns the truth.
 
@@ -249,12 +253,12 @@ verify( *syms, &block )
 
 [source,ruby]
 ----
-index( *syms, **opts )
+index( *symbols, **options )
 ----
 
 * Parameter:
-  ** syms:            Field label symbols.
-  ** opts:            Options for Mongo::Collection#indexes().
+  ** symbols:         Field names.
+  ** options:         Options for Mongo::Collection#indexes().
 
 === Verify field value is not nil nor empty.
 
@@ -269,6 +273,70 @@ having?( label )
 * Parameter:
   ** label:           Field label for method call.
 
+=== Name the search condition.
+
+[source,ruby]
+----
+filter( symbol, filter_or_cond )
+----
+
+* Parameter:
+  ** symbol:          Filter name.
+  ** filter_or_cond:  Filter or search criteria.
+
+=== Search condition.
+
+[source,ruby]
+----
+where( filter = nil, **conditions )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filter:          Filter name symbol, or filter instance.
+  ** conditions:      Search criteria.
+
+=== NOT search condition.
+
+[source,ruby]
+----
+not( filter = nil, **conditions )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filter:          Filter name symbol, or filter instance.
+  ** conditions:      Search criteria.
+
+=== AND search condition.
+
+[source,ruby]
+----
+and( *filters )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filters:         Filter name symbol, or filter instance.
+
+=== OR search condition.
+
+[source,ruby]
+----
+or( *filters )
+----
+
+* Result:
+  ** Filter instance.
+
+* Parameter:
+  ** filters:         Field name symbol, or filter instance.
 
 == Contributing
 
