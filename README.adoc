@@ -5,9 +5,12 @@ Yet another mongo wrapper library.
 == Features
 
 * A light library that depends only on the mongo driver and bson, except for built-in and standard attachments.
-* Item default value can be described in the block.
-* Item constraints can be described by Array, Range, and Proc.
-* Checks that constraints are met when saving and setting values.
+* Document item constraints can be described in Array, Range, Regexp, Proc instances, or base classes.
+* Check if the constraint conditions are met when saving the document.
+* Check if the constraint condition is satisfied when setting the item value of the document.
+* The contents of undefined items in the document can be described by value or Proc.
+* Item settings can be described in values or Proc when creating a document.
+* Item settings can be described in values or Proc when updating the document.
 
 == Installation
 
