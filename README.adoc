@@ -57,13 +57,14 @@ class Book
   field  :title,      String,  :must
   field  :author,     String
   field  :publisher,  String
-  field  :style,      String,  ["A4","B5","A5","B6"]
-  field  :price,      Integer, (0..1_000_000)
-  field  :page,       Integer, proc{ page % 4 == 0 }
-  field  :isbn,       String,  proc{ isbn? }
-  field  :lang,       String,  default: "en"
-  field  :created_at, Time,    create: proc{ Time.now }
-  field  :updated_at, Time,    update: proc{ Time.now }
+  field  :style,      String,   %w[hardcover, softcover, paperback]
+  field  :size,       String,   /[AB]\d/
+  field  :price,      Integer,  (0..1_000_000)
+  field  :page,       Integer,  proc{ page % 4 == 0 }
+  field  :isbn,       String,   proc{ isbn? }
+  field  :lang,       String,   default: "en"
+  field  :created_at, Time,     create: proc{ Time.now }
+  field  :updated_at, Time,     update: proc{ Time.now }
 
   filter :foobar,     {title: /foobar/}
 
@@ -87,13 +88,13 @@ end
 book = Book.new
 book.title = "title 1"
 book.price = 1000
-book.style = "A4"
+book.size = "A4"
 book.save
 
-book = Book.new( title: "title 2", price: 2000, style: "A5" )
+book = Book.new( title: "title 2", price: 2000, size: "A5" )
 book.save
 
-doc = { title: "title 3", price: 3000, style: "A6" }
+doc = { title: "title 3", price: 3000, size: "A6" }
 Book.create( **doc )
 ----
 
@@ -114,14 +115,14 @@ Book.where( title: /title/ ).projection( _id: 0 ).each do |book|
   p book
 end
 
-Book.where( price: (1..2000), style: ["A4","A5"] ).each do |book|
+Book.where( price: (1..2000), size: ["A4","A5"] ).each do |book|
   p book
 end
 
 filter1 = Book.where( title: /title/ )
 filter2 = Book.where( :foobar )
 filter3 = Book.where( price: (1..2000) )
-filter4 = Book.where( style: ["A4","A5"] )
+filter4 = Book.where( size: ["A4","A5"] )
 
 Book.not( filter1 ).each do |book|
   p book

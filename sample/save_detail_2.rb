@@ -10,6 +10,7 @@ class Book
   field  :author
   field  :publisher
   field  :style
+  field  :size
   field  :price,      Integer
   field  :page,       Integer
   field  :isbn
@@ -24,7 +25,8 @@ book  =  Book.new
 book.title  =  "title detail 2"
 book.author  =  "Bob"
 book.publisher  =  "Foobar"
-book.style  =  "A5"
+book.style  =  "softcover"
+book.size  =  "A5"
 book.price  =  2000
 book.page  =  200
 book.isbn  =  "978-3-16-148410-0"

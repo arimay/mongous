@@ -9,13 +9,14 @@ class Book
   field  :title,        String,  :must
   field  :author,       String
   field  :publisher,    String
-  field  :style,        String,  %w[A4 A5 A6]
+  field  :style,        String,  %w[hardcover softcover paperback]
+  field  :size,         String,  /[AB]\d/
   field  :price,        Integer, (0..1_000_000)
   field  :page,         Integer, proc{ page % 4 == 0 }
   field  :isbn,         String,  proc{ isbn? }
   field  :lang,         String,  default: "en"
-  field  :created_at,   Time,    create: ->(){ Time.now }
-  field  :updated_at,   Time,    update: ->(){ Time.now }
+  field  :created_at,   Time,    create: proc{ Time.now }
+  field  :updated_at,   Time,    update: proc{ Time.now }
 
   verify :strict
   verify { having?( title ) }
@@ -31,11 +32,12 @@ end
 
 book  =  Book.new
 book.title       =  "declare strict"
-book.author      =  "foobar"
+book.author      =  "David"
 book.publisher   =  nil
-book.style       =  "A6"
-book.price       =  300
-book.page        =  300
+book.style       =  "paperback"
+book.size        =  "A7"
+book.price       =  400
+book.page        =  400
 book.isbn        =  "978-3-16-148410-0"
 # book.lang        =  nil  # (default)
 # book.created_at  =  nil  # (create)

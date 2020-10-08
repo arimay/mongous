@@ -52,17 +52,25 @@ module Mongous
       else
         savemode  =  :update
       end
+
       self.class.fields.each do |label, field|
+        default_value  =  getvalue_or_callproc( field[:default] )
         _must  =  field[:_attrs].include?(:must)
         if  @doc.has_key?(label)
-          if  _must  &&  !having?( @doc[label] )
-            raise  Mongous::Error, "must and not having field. : #{ label }"
+          if  !having?( @doc[label] )
+            if  default_value
+              self[label]  =  default_value
+            elsif  _must
+              raise  Mongous::Error, "must but unassigned field. : #{ label }"
+            elsif  self.class.symbols[:strict]
+              self[label]  =  nil
+            end
           end
         else
-          if  default_value  =  getvalue_or_callproc( field[:default] )
+          if  default_value
             self[label]  =  default_value
           elsif  _must
-            raise  Mongous::Error, "must and unassigned field. : #{ label }"
+            raise  Mongous::Error, "must but unassigned field. : #{ label }"
           elsif  self.class.symbols[:strict]
             self[label]  =  nil
           end
@@ -100,7 +108,7 @@ module Mongous
       label  =  label.to_s
 
       if  self.class.symbols[:strict]
-        if  !self.class.fields.keys.include?(label)
+        if  !(self.class.fields.keys.include?(label) || (label == "_id"))
           raise  Mongous::Error, "undefined field. : #{ label }"
         end
       end
@@ -174,6 +182,10 @@ module Mongous
         when  Range
           if  !attr.cover?( value )
             raise  Mongous::Error, "out of range. : #{ label } : #{ value }"
+          end
+        when  Regexp
+          if  !attr.match( value )
+            raise  Mongous::Error, "unmatch regexp. : #{ label } : #{ value }"
           end
         end
       end

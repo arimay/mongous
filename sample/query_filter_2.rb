@@ -8,12 +8,12 @@ class Book
 
   filter  :title1, { title: /filter/ }
   filter  :price1, { price: (2000..3000) }
-  filter  :page1,  where( style: %w[A3 A4] )
+  filter  :page1,  where( size: %w[A3 A4] )
 end
 
 (1..5).each do |n|
   unless  Book.where( title: "filter #{n}" ).first
-    Book.create( title: "filter #{n}", author: (0x40 + n).chr, style: "A#{n + 3}", price: n * 1000, page: n * 100 )
+    Book.create( title: "filter #{n}", author: (0x40 + n).chr, size: "A#{n + 3}", price: n * 1000, page: n * 100 )
   end
 end
 puts

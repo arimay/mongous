@@ -105,8 +105,8 @@ module Mongous
 
       attrs.each do |attr|
         if klass  =  attr.class 
-          if ![Class, Range, Array, Proc, Symbol].include?(klass)
-            raise  Mongous::Error, "field args error. : #{ attr } on #{ symbol } at #{ call_from }"
+          if ![Class, Range, Array, Regexp, Proc, Symbol].include?(klass)
+            raise  Mongous::Error, "'field' arguments error. : #{ attr } on #{ symbol } at #{ call_from }"
           end
         end
       end
@@ -114,7 +114,7 @@ module Mongous
       items.each do |key, value|
         next    if [:default, :create, :update].include?(key) && [Proc, String, Numeric].include?(value.class)
 
-        raise  Mongous::Error, "field opts error. : #{key} on #{ symbol } at #{ call_from }"
+        raise  Mongous::Error, "'field' options error. : #{key} on #{ symbol } at #{ call_from }"
       end
 
       items[:_attrs]  =  attrs
@@ -130,6 +130,8 @@ module Mongous
         m  =  /(.*?):(\d+)/.match( caller()[0] )
         call_from  =  [ m[1], m[2] ].join(":")
         blocks[call_from]  =  block
+      else
+        raise  Mongous::Error, "'verify' arguments error. need directives or block."
       end
     end
 
@@ -151,7 +153,7 @@ module Mongous
       else
         m  =  /(.*?):(\d+)/.match( caller()[0] )
         call_from  =  [ m[1], m[2] ].join(":")
-        raise  Mongous::Error, "filter error. : #{symbol}, #{filter_or_condition} at #{ call_from }"
+        raise  Mongous::Error, "'filter' arguments error. : #{symbol}, #{filter_or_condition} at #{ call_from }"
       end
     end
   end

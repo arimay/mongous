@@ -10,6 +10,7 @@ class Book
   field  :author
   field  :publisher
   field  :style
+  field  :size
   field  :price
   field  :page
   field  :publish_at

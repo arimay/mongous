@@ -14,6 +14,7 @@ class Book2
   field  :author
   field  :publisher
   field  :style
+  field  :size
   field  :price
   field  :page
   field  :isbn
@@ -30,13 +31,14 @@ class Book3
   field  :title,                 :must
   field  :author
   field  :publisher,    String,  :must
-  field  :style,        String,  %w[A4 A5 A6]
+  field  :style,        String,  %w[hardcover softcover paperback]
+  field  :size,         String,  /[AB]\d/
   field  :price,        Integer, (0..1_000_000)
   field  :page,         Integer, proc{ page > 0 }
   field  :isbn,                  proc{ isbn? }
   field  :lang,         String,  default: "en"
-  field  :created_at,   Time,    create: ->(){ Time.now }
-  field  :updated_at,   Time,    update: ->(){ Time.now }
+  field  :created_at,   Time,    create: proc{ Time.now }
+  field  :updated_at,   Time,    update: proc{ Time.now }
 
   verify :strict
   verify { having?( title ) }

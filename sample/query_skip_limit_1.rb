@@ -3,35 +3,45 @@ require "mongous"
 
 Mongous.connect!
 
-class Book
+class Item
   include  Mongous::Document
 end
 
-p count  =  Book.where.count
-puts
-
-p count  =  Book.where[0..4].count
-puts
-
-p count  =  Book.where[0...4].count
-puts
-
-p count  =  Book.where[0, 4].count
-puts
-
-p count  =  Book.where[5, 5].count
-puts
-
-pp books  =  Book.where[0, 2].all
-puts
-
-filter  =  Book.where( title: /title/ )
-filter[0, 4].each do |book|
-  p book
+(0...10).each do |n|
+  unless  Item.where( n: n ).first
+    Item.create( n: n, tag: [0x40 + n].pack("C") )
+  end
 end
 puts
-filter[4, 4].each do |book|
-  p book
+
+p count  =  Item.count
+puts
+
+p count  =  Item.where.count
+puts
+
+p count  =  Item.where[0..4].count
+puts
+
+p count  =  Item.where[0...4].count
+puts
+
+p count  =  Item.where[0, 4].count
+puts
+
+p count  =  Item.where[5, 5].count
+puts
+
+pp books  =  Item.where[0, 2].all
+puts
+
+filter  =  Item.where
+filter[0, 4].each do |item|
+  p item
+end
+puts
+filter[4, 4].each do |item|
+  p item
 end
 puts
 

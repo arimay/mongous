@@ -7,13 +7,13 @@ class Book
   include  Mongous::Document
 
   field  :title,        :must
-  field  :style,        String,  %w[hardcover softcover paperback]
+  field  :price,        Integer, (0..1_000_000)
 end
 
 begin
   book  =  Book.new
-  book.title  =  "title style"
-  book.style  =  "newspaper"
+  book.title  =  "title price"
+  book.price  =  -1
   book.save
 
 rescue => e

@@ -2,7 +2,8 @@
 module Mongous
   module Extention
     def count
-      self.collection.find.count
+#     self.collection.find.count
+      self.collection.estimated_document_count
     end
 
     def first
@@ -175,7 +176,7 @@ module Mongous
 
     def do_find
       _filter  =  @filter
-      _option  =  @option
+      _option  =  @option.dup
       _option[:projection]  =  @projection    if @projection
       found  =  @klass.collection.find( _filter, _option )
       found  =  found.sort( @sort )    if  @sort
@@ -185,7 +186,10 @@ module Mongous
     end
 
     def count
-      _count  =  do_find.count
+      found  =  @klass.collection.find( @filter )
+      found  =  found.skip( @skip )    if  @skip
+      found  =  found.limit( @limit )    if  @limit
+      _count  =  found.count_documents
       if  @skip
         if  @skip > _count
           0
@@ -219,8 +223,7 @@ module Mongous
     end
 
     def delete
-      _filter  =  @filter
-      @klass.collection.delete_many( _filter )
+      @klass.collection.delete_many( @filter )
     end
   end
 end

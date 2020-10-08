@@ -9,7 +9,7 @@ end
 
 (1..3).each do |n|
   unless  Book.where( title: "complex #{n}" ).first
-    Book.create( title: "complex #{n}", author: (0x40 + n).chr, style: "A#{n + 3}", price: n * 1000, page: n * 100 )
+    Book.create( title: "complex #{n}", author: (0x40 + n).chr, size: "A#{n + 3}", price: n * 1000, page: n * 100 )
   end
 end
 puts

@@ -9,7 +9,7 @@ end
 
 (0...10).each do |n|
   unless  Item.where( n: n ).first
-    Item.create( n: n )
+    Item.create( n: n, tag: [0x40 + n].pack("C") )
   end
 end
 puts

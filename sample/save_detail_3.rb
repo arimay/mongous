@@ -9,13 +9,14 @@ class Book
   field  :title,                :must
   field  :author
   field  :publisher
-  field  :style,                %w[ A4 A5 A6 ]
+  field  :style,                %w[hardcover, softcover, paperback]
+  field  :size,                 /[AB]\d/
   field  :price,      Integer,  (0..1_000_000)
   field  :page,       Integer,  proc{ page > 0 }
   field  :isbn,                 proc{ isbn? }
   field  :lang,                 default: "en"
-  field  :created_at, Time,     create: ->(){ Time.now }
-  field  :updated_at, Time,     update: ->(){ Time.now }
+  field  :created_at, Time,     create: proc{ Time.now }
+  field  :updated_at, Time,     update: proc{ Time.now }
 
   verify :strict
 
@@ -30,7 +31,8 @@ book  =  Book.new
 book.title  =  "title detail 3"
 book.author  =  "Candy"
 #book.publisher
-book.style  =  "A6"
+book.style  =  "paperback"
+book.size  =  "A6"
 book.price  =  3000
 book.page  =  300
 book.isbn  =  "978-3-16-148410-0"

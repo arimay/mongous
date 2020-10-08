@@ -3,9 +3,9 @@ require "mongous"
 
 Mongous.connect!
 
-class Book
+class Item
   include  Mongous::Document
 end
 
-Book.where( title: "title 1" ).delete
+Item.where.delete
 

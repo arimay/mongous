@@ -10,9 +10,10 @@ end
 
 book  =  Book.new
 book.title       =  "declare compact"
-book.author      =  "foobar"
+book.author      =  "Alice"
 book.publisher   =  nil
-book.style       =  "A4"
+book.style       =  "hardcover"
+book.size        =  "A4"
 book.price       =  100
 book.page        =  100
 # book.publish_at  =  nil # (default)

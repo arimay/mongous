@@ -10,6 +10,7 @@ class Book
   field  :author
   field  :publisher
   field  :style
+  field  :size
   field  :price
   field  :page
   field  :publish_at
@@ -24,9 +25,10 @@ end
 
 book  =  Book.new
 book.title       =  "declare index 1"
-book.author      =  "foobar"
+book.author      =  "Candy"
 book.publisher   =  nil
-book.style       =  "A6"
+book.style       =  "paperback"
+book.size        =  "A6"
 book.price       =  300
 book.page        =  300
 # book.publish_at  =  nil  # (default)
