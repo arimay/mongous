@@ -15,8 +15,8 @@ class Book
   field  :page,         Integer, proc{ page > 0 }
   field  :isbn,         String,  proc{ isbn? }
   field  :lang,         String,  default: "en"
-  field  :created_at,   Time,    create: ->(){ Time.now }
-  field  :updated_at,   Time,    update: ->(){ Time.now }
+  field  :created_at,   Time,    create: proc{ Time.now }
+  field  :updated_at,   Time,    update: proc{ Time.now }
 
   verify :strict
   verify { having?( title ) }

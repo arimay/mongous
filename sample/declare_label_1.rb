@@ -13,9 +13,10 @@ class Book
   field  :size
   field  :price
   field  :page
-  field  :publish_at
   field  :isbn
   field  :lang
+  field  :created_at
+  field  :updated_at
 
   verify :strict
 end
@@ -29,9 +30,10 @@ book.style       =  "softcover"
 book.size        =  "A5"
 book.price       =  200
 book.page        =  200
-# book.publish_at  =  nil  # (default)
-# book.isbn        =  "978-3-16-148410-0"
+book.isbn        =  "978-3-16-148410-0"
 # book.lang        =  nil  # (default)
+# book.created_at  =  nil  # (created)
+# book.updated_at  =  nil  # (updated)
 book.save
 
 

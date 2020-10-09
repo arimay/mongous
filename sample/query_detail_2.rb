@@ -13,9 +13,10 @@ class Book
   field  :size
   field  :price,      Integer
   field  :page,       Integer
-  field  :publish_at, Date
   field  :isbn
   field  :lang
+  field  :created_at, Time
+  field  :updated_at, Time
 
   verify :strict
 end

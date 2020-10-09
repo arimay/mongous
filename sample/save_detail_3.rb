@@ -30,14 +30,14 @@ end
 book  =  Book.new
 book.title  =  "title detail 3"
 book.author  =  "Candy"
-#book.publisher
+book.publisher
 book.style  =  "paperback"
 book.size  =  "A6"
 book.price  =  3000
 book.page  =  300
 book.isbn  =  "978-3-16-148410-0"
-#book.lang
-#book.created_at
-#book.updated_at
+# book.lang
+# book.created_at
+# book.updated_at
 book.save
 

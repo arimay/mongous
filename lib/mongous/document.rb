@@ -108,7 +108,8 @@ module Mongous
       label  =  label.to_s
 
       if  self.class.symbols[:strict]
-        if  !(self.class.fields.keys.include?(label) || (label == "_id"))
+        labels  =  ["_id"] + self.class.fields.keys
+        if  !labels.include?( label )
           raise  Mongous::Error, "undefined field. : #{ label }"
         end
       end

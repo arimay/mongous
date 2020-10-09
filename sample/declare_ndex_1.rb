@@ -13,9 +13,10 @@ class Book
   field  :size
   field  :price
   field  :page
-  field  :publish_at
   field  :isbn
   field  :lang
+  field  :created_at
+  field  :updated_at
 
   index  :title
 
@@ -31,9 +32,10 @@ book.style       =  "paperback"
 book.size        =  "A6"
 book.price       =  300
 book.page        =  300
-# book.publish_at  =  nil  # (default)
 book.isbn        =  "978-3-16-148410-0"
 # book.lang        =  nil  # (default)
+# book.created_at  =  nil  # (created)
+# book.updated_at  =  nil  # (updated)
 book.save
 
 
