@@ -9,8 +9,7 @@ Yet another mongo wrapper library.
 * Check if the constraint conditions are met when saving the document.
 * Check if the constraint condition is satisfied when setting the item value of the document.
 * The contents of undefined items in the document can be described by value or Proc.
-* Item settings can be described in values or Proc when creating a document.
-* Item settings can be described in values or Proc when updating the document.
+* Item contents at the time of document creation and update can be described by value or Proc.
 
 == Installation
 
