@@ -104,6 +104,14 @@ module Mongous
       self
     end
 
+    def to_hash
+      @doc.dup
+    end
+
+    def to_json
+      @doc.to_json
+    end
+
     def []( label )
       label  =  label.to_s
 
