@@ -39,10 +39,7 @@ Or install it yourself as:
 require  "mongous"
 
 Mongous.connect!
-
-class Book
-  include  Mongous::Document
-end
+Mongous.attach!  :Book
 ----
 
 === Detail declaration
@@ -56,7 +53,7 @@ Mongous.connect!  ["localhost:27017"], database: "test"
 class Book
   include  Mongous::Document
 
-  field  :title,      String,  :must
+  field  :title,      String,   :must
   field  :author,     String
   field  :publisher,  String
   field  :style,      String,   %w[hardcover, softcover, paperback]
@@ -190,7 +187,20 @@ Mongous.connect( hosts_or_uri = nil, **options )
 * Result:
   ** Mongo::Client instance.
 
-=== Include document functions.
+=== Define collection operate class with default settings.
+
+[source,ruby]
+----
+Mongous.attach!( *names )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** names:           Collection names. (String or Symbol)
+
+=== Include document functions into collection operate class.
 
 [source,ruby]
 ----
@@ -295,7 +305,7 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-where( filter = nil, **conditions )
+Collection operate class #where( filter = nil, **conditions )
 ----
 
 * Result:
@@ -309,7 +319,7 @@ where( filter = nil, **conditions )
 
 [source,ruby]
 ----
-not( filter = nil, **conditions )
+Collection operate class #not( filter = nil, **conditions )
 ----
 
 * Result:
@@ -323,7 +333,7 @@ not( filter = nil, **conditions )
 
 [source,ruby]
 ----
-and( *filters )
+Collection operate class #and( *filters )
 ----
 
 * Result:
@@ -336,7 +346,7 @@ and( *filters )
 
 [source,ruby]
 ----
-or( *filters )
+Collection operate class #or( *filters )
 ----
 
 * Result:
@@ -344,6 +354,65 @@ or( *filters )
 
 * Parameter:
   ** filters:         Field name symbol, or filter instance.
+
+=== Save document.
+
+[source,ruby]
+----
+Document operate object #save
+----
+
+* Result:
+  ** nil.
+
+=== Convert document to Hash.
+
+[source,ruby]
+----
+Document operate object #to_hash
+----
+
+* Result:
+  ** Hash object.
+
+=== Convert document to JSON.
+
+[source,ruby]
+----
+Document operate object #to_hash
+----
+
+* Result:
+  ** JSON String.
+
+=== Read document field.
+
+[source,ruby]
+----
+Document operate object #[]( field_name )
+Document operate object #field_name
+----
+
+* Result:
+  ** field_value.
+
+* Parameter:
+  ** field_name:      Field name.
+
+=== Write document field.
+
+[source,ruby]
+----
+Document operate object #[]=( field_name, field_value )
+Document operate object #field_name = field_value
+----
+
+* Result:
+  ** field_value.
+
+* Parameter:
+  ** field_name:      Field name.
+  ** field_value:     Field value.
 
 == Contributing
 

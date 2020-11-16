@@ -4,7 +4,7 @@
 
 == 特徴
 
-* 組込みと標準添付を除いて、mongo driver と bson のみに依存する軽いライブラリである。
+* 組込みと標準添付を除いて、mongo driver と bson のみに依存する軽いライブラリである.
 * ドキュメント項目の制約条件を Array, Range, Regexp, Proc インスタンスまたは基本クラスで記述できる.
 * ドキュメント保存時に制約条件を満たすか検査する.
 * ドキュメントの項目値設定時に制約条件を満たすか検査する.
@@ -32,17 +32,14 @@ gem 'mongous'
 
 == 使い方
 
-=== 簡素な定義
+=== 簡潔な定義
 
 [source,ruby]
 ----
 require  "mongous"
 
 Mongous.connect!
-
-class Book
-  include  Mongous::Document
-end
+Mongous.attach!  :Book
 ----
 
 === 詳細な定義
@@ -190,7 +187,20 @@ Mongous.connect( hosts_or_uri = nil, **options )
 * Result:
   ** Mongo::Client インスタンス.
 
-=== ドキュメントの機能を取り入れる.
+=== コレクション操作クラスをデフォルト設定で定義する.
+
+[source,ruby]
+----
+Mongous.attach!( *names )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** names:           コレクション名. (String または Symbol)
+
+=== コレクション操作クラスにドキュメントの機能を取り入れる.
 
 [source,ruby]
 ----
@@ -295,7 +305,7 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-where( filter = nil, **conditions )
+コレクション操作クラス #where( filter = nil, **conditions )
 ----
 
 * Result:
@@ -309,7 +319,7 @@ where( filter = nil, **conditions )
 
 [source,ruby]
 ----
-not( filter = nil, **conditions )
+コレクション操作クラス #not( filter = nil, **conditions )
 ----
 
 * Result:
@@ -323,7 +333,7 @@ not( filter = nil, **conditions )
 
 [source,ruby]
 ----
-and( *filters )
+コレクション操作クラス #and( *filters )
 ----
 
 * Result:
@@ -336,7 +346,7 @@ and( *filters )
 
 [source,ruby]
 ----
-or( *filters )
+コレクション操作クラス #or( *filters )
 ----
 
 * Result:
@@ -344,6 +354,65 @@ or( *filters )
 
 * Parameter:
   ** filters:         項目名またはフィルタインスタンス
+
+=== ドキュメントを保存.
+
+[source,ruby]
+----
+ドキュメント操作オブジェクト #save
+----
+
+* Result:
+  ** nil.
+
+=== ドキュメントをHashに変換.
+
+[source,ruby]
+----
+ドキュメント操作オブジェクト #to_hash
+----
+
+* Result:
+  ** Hash object.
+
+=== ドキュメントをJSONに変換.
+
+[source,ruby]
+----
+ドキュメント操作オブジェクト #to_hash
+----
+
+* Result:
+  ** JSON String.
+
+=== ドキュメントの項目値を読む.
+
+[source,ruby]
+----
+ドキュメント操作オブジェクト #[]( field_name )
+ドキュメント操作オブジェクト #field_name
+----
+
+* Result:
+  ** 項目値.
+
+* Parameter:
+  ** field_name:      項目名.
+
+=== ドキュメントの項目値を書く.
+
+[source,ruby]
+----
+ドキュメント操作オブジェクト #[]=( field_name, field_value )
+ドキュメント操作オブジェクト #field_name = field_value
+----
+
+* Result:
+  ** 項目値.
+
+* Parameter:
+  ** field_name:      項目名.
+  ** field_value:     項目値.
 
 == 貢献
 
