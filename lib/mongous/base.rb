@@ -50,6 +50,36 @@ module Mongous
       self.class_variable_set( :@@client, _client )
     end
 
+    def attach!( *names )
+      raise  Mongous::Error, "missing argument."   if names.empty?
+
+      names.each do |name|
+        case  name
+        when  String
+        when  Symbol
+          name  =  name.to_s
+        else
+          raise  Mongous::Error, "type invalid. :  #{ name }"
+        end
+
+        raise  Mongous::Error, "missing argument."   unless  /^[A-Z]/.match(name)
+
+        if  Object.const_defined?( name )
+          if  Object.const_get( name ).include?( Mongous::Document )
+            Object.class_eval{ remove_const( name ) }
+          else
+            raise  Mongous::Error, "type invalid. :  #{ Object.class_eval(name) }"
+          end
+        end
+
+        Object.class_eval <<-CLASS
+          class #{name}
+            include Mongous::Document
+          end
+        CLASS
+      end
+    end
+ 
     def client
       self.class_variable_get( :@@client )    rescue  nil
     end
