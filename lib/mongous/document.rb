@@ -100,7 +100,6 @@ module Mongous
       when  :update
         self.class.collection.update_one( { "_id"=> @doc["_id"] }, { '$set' => @doc } )
       end
-
       self
     end
 
