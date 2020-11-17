@@ -2,7 +2,6 @@
 module Mongous
   module Extention
     def count
-#     self.collection.find.count
       self.collection.estimated_document_count
     end
 
@@ -19,6 +18,10 @@ module Mongous
 
     def each( &block )
       all.each( &block )
+    end
+
+    def map( &block )
+      all.map( &block )
     end
 
     def delete
@@ -220,6 +223,10 @@ module Mongous
 
     def each( &block )
       all.each( &block )
+    end
+
+    def map( &block )
+      all.map( &block )
     end
 
     def delete
