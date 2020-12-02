@@ -81,11 +81,14 @@ module Mongous
     end
  
     def client
-      self.class_variable_get( :@@client )    rescue  nil
+      if not self.class_variable_defined?( :@@client )
+        connect!
+      end
+      self.class_variable_get( :@@client )
     end
 
     def client=( _client )
-      if  !_client.is_a?( ::Mongo::Client )
+      if not _client.is_a?( ::Mongo::Client )
         raise  Mongous::Error, "type invalid. :  #{ _client }"
       end
       self.class_variable_set( :@@client, _client )

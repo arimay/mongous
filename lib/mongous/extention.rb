@@ -60,32 +60,34 @@ module Mongous
     end
 
     def fields
-      self_class_variable( :@@fields, {} )
+      setup_class_variable( :@@fields, {} )
     end
 
     def symbols
-      self_class_variable( :@@symbols, {} )
+      setup_class_variable( :@@symbols, {} )
     end
 
     def blocks
-      self_class_variable( :@@blocks, {} )
+      setup_class_variable( :@@blocks, {} )
     end
 
     def indexes
-      self_class_variable( :@@indexes, [] )
+      setup_class_variable( :@@indexes, [] )
     end
 
     def filters
-      self_class_variable( :@@filters, {} )
+      setup_class_variable( :@@filters, {} )
     end
 
     def defaults
-      self_class_variable( :@@defaults, {} )
+      setup_class_variable( :@@defaults, {} )
     end
 
-    def self_class_variable( symbol, default )
+    def setup_class_variable( symbol, default = {}, &block )
       if self.class_variable_defined?( symbol )
         self.class_variable_get( symbol )
+      elsif block_given?
+        self.class_variable_set( symbol, block.call )
       else
         self.class_variable_set( symbol, default )
       end

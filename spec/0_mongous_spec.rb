@@ -2,7 +2,7 @@ RSpec.describe Mongous do
   it "has a version number" do
     expect(Mongous::VERSION).not_to be nil
   end
-  it "default client is nil" do
-    expect( Mongous.client ).to be nil
+  it "default client has default connection." do
+    expect( Mongous.client ).not_to be nil
   end
 end
