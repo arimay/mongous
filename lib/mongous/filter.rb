@@ -28,6 +28,10 @@ module Mongous
       self.collection.delete_many({})
     end
 
+    def select( *keys, **hash )
+      Filter.new( self ).select( *keys, **hash )
+    end
+
     def where( filter = nil, **conditions )
       condition  =  normalize( filter, conditions )
       Filter.new( self ).where( condition )
@@ -136,14 +140,32 @@ module Mongous
       self.dup
     end
 
-    def projection( _projection )
-      @projection  =  _projection
+    def projection( *keys, **hash )
+      if not keys.empty?
+        @projection  =  {}
+        keys.each do |key|
+          @projection[key]  =  1
+        end
+      elsif not hash.empty?
+        @projection  =  hash
+      else
+        @projection  =  nil
+      end
       self.dup
     end
     alias  :select  :projection
 
-    def sort( _sort )
-      @sort  =  _sort
+    def sort( *keys, **hash )
+      if not keys.empty?
+        @sort  =  {}
+        keys.each do |key|
+          @sort[key]  =  1
+        end
+      elsif not hash.empty?
+        @sort  =  hash
+      else
+        @sort  =  nil
+      end
       self.dup
     end
     alias  :order  :sort
@@ -177,7 +199,7 @@ module Mongous
       self.dup
     end
 
-    def do_find
+    def exec_query
       _filter  =  @filter
       _option  =  @option.dup
       _option[:projection]  =  @projection    if @projection
@@ -211,12 +233,12 @@ module Mongous
     end
 
     def first
-      doc  =  do_find.first
+      doc  =  exec_query.first
       @klass.new( **doc )    if doc
     end
 
     def all
-      do_find.map do |doc|
+      exec_query.map do |doc|
         @klass.new( **doc )
       end
     end
