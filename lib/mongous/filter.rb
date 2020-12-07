@@ -142,10 +142,7 @@ module Mongous
 
     def projection( *keys, **hash )
       if not keys.empty?
-        @projection  =  {}
-        keys.each do |key|
-          @projection[key]  =  1
-        end
+        @projection  =  Hash[ keys.zip( Array.new(keys.length, 1) ) ]
       elsif not hash.empty?
         @projection  =  hash
       else
@@ -157,10 +154,7 @@ module Mongous
 
     def sort( *keys, **hash )
       if not keys.empty?
-        @sort  =  {}
-        keys.each do |key|
-          @sort[key]  =  1
-        end
+        @sort  =  Hash[ keys.zip( Array.new( keys.length, 1 ) ) ]
       elsif not hash.empty?
         @sort  =  hash
       else

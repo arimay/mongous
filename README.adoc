@@ -136,7 +136,15 @@ Book.find( { title: /title/ }, { projection: {_id: 0} } ).each do |book|
   p book
 end
 
-pp Book.where( title: /title/ )[0, 5].all
+Book.where( title: /title/ ).select( _id: 0 ).each do |book|
+  p book
+end
+
+Book.select( _id: 0 )[0, 5].each do |book|
+  p book
+end
+
+pp Book.select( :title, :price, :size )[5, 5].all
 ----
 
 === Update document

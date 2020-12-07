@@ -19,22 +19,32 @@ Label.each do |label|
 end
 puts
 
-Label.where.projection( tag: 1 ).each do |label|
+Label.select( tag: 1 ).each do |label|
   p label
 end
 puts
 
-Label.where.projection( _id: 0, n: 1 ).each do |label|
+Label.select( :tag ).each do |label|
   p label
 end
 puts
 
-Label.where.select( _id: 0, n: 1, tag: 1 ).each do |label|
+Label.select( _id: 0, n: 1 ).each do |label|
   p label
 end
 puts
 
-Label.where( n: [0,2,4,6,8] ).select( _id: 0, n: 1, tag: 1 ).each do |label|
+Label.select( n: 1, tag: 1 ).each do |label|
+  p label
+end
+puts
+
+Label.select( :n, :tag ).each do |label|
+  p label
+end
+puts
+
+Label.select( _id: 0, n: 1, tag: 1 ).where( n: [0,2,4,6,8] ).each do |label|
   p label
 end
 puts
