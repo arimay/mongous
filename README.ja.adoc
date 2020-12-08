@@ -227,6 +227,19 @@ self.client=( client )
 * Parameter:
   ** client:          Mongo::Client インスタンス.
 
+=== Get binded database.
+
+[source,ruby]
+----
+self.client
+----
+
+* Result:
+  ** Mongo::Client インスタンス.
+
+* Parameter:
+  ** None.
+
 === 別のコレクションを割り当てる.
 
 [source,ruby]
@@ -240,11 +253,37 @@ self.collection_name=( collection_name )
 * Parameter:
   ** collection_name: コレクション名.
 
+=== Get binded collection name.
+
+[source,ruby]
+----
+self.collection_name
+----
+
+* Result:
+  ** Collection name 文字列.
+
+* Parameter:
+  ** None.
+
+=== Get collection.
+
+[source,ruby]
+----
+self.collection( collection_name = nil )
+----
+
+* Result:
+  ** Mongo::Collection インスタンス.
+
+* Parameter:
+  ** collection_name: 一時指定するコレクション名.
+
 === ドキュメントの要素を定義する.
 
 [source,ruby]
 ----
-field( symbol, *attrs, **items )
+self.field( symbol, *attrs, **items )
 ----
 
 * Parameter:
@@ -265,7 +304,7 @@ field( symbol, *attrs, **items )
 
 [source,ruby]
 ----
-verify( *directives, &block )
+self.verify( *directives, &block )
 ----
 
 * Parameter:
@@ -277,7 +316,7 @@ verify( *directives, &block )
 
 [source,ruby]
 ----
-index( *symbols, **options )
+self.index( *symbols, **options )
 ----
 
 * Parameter:
@@ -288,7 +327,7 @@ index( *symbols, **options )
 
 [source,ruby]
 ----
-having?( label )
+self.having?( label )
 ----
 
 * Result:
@@ -301,22 +340,38 @@ having?( label )
 
 [source,ruby]
 ----
-filter( symbol, filter_or_cond )
+self.filter( symbol, filter_or_cond )
 ----
 
 * Parameter:
   ** symbol:          項目名
   ** filter_or_cond:  フィルタまたは検索条件
 
+=== 出力項目を選択する.
+
+[source,ruby]
+----
+Mongous::Document.select( *keys, **kwargs )
+Mongous::Filter#select( *keys, **kwargs )
+----
+
+* Result:
+  ** Mongous::Filter instance.
+
+* Parameter:
+  ** keys:            項目名
+  ** kwargs:          項目名と項目値.
+
 === 検索条件.
 
 [source,ruby]
 ----
-コレクション操作クラス #where( filter = nil, **conditions )
+Mongous::Document.where( filter = nil, **conditions )
+Mongous::Filter#where( filter = nil, **conditions )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filter:          項目名またはフィルタインスタンス
@@ -326,11 +381,12 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-コレクション操作クラス #not( filter = nil, **conditions )
+Mongous::Document.not( filter = nil, **conditions )
+Mongous::Filter#not( filter = nil, **conditions )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filter:          項目名またはフィルタインスタンス
@@ -340,11 +396,12 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-コレクション操作クラス #and( *filters )
+Mongous::Document.and( *filters )
+Mongous::Filter#and( *filters )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filters:         項目名またはフィルタインスタンス
@@ -353,20 +410,34 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-コレクション操作クラス #or( *filters )
+Mongous::Document.or( *filters )
+Mongous::Filter#or( *filters )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filters:         項目名またはフィルタインスタンス
+
+=== ドキュメントを作成.
+
+[source,ruby]
+----
+Mongous::Document.create( **doc )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** doc:             キーワード引数.
 
 === ドキュメントを保存.
 
 [source,ruby]
 ----
-ドキュメント操作オブジェクト #save
+Mongous::Document#save
 ----
 
 * Result:
@@ -376,7 +447,7 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-ドキュメント操作オブジェクト #to_hash
+Mongous::Document#to_hash
 ----
 
 * Result:
@@ -386,7 +457,7 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-ドキュメント操作オブジェクト #to_hash
+Mongous::Document#to_json
 ----
 
 * Result:
@@ -396,8 +467,8 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-ドキュメント操作オブジェクト #[]( field_name )
-ドキュメント操作オブジェクト #field_name
+Mongous::Document#[]( field_name )
+Mongous::Document#field_name
 ----
 
 * Result:
@@ -410,8 +481,8 @@ filter( symbol, filter_or_cond )
 
 [source,ruby]
 ----
-ドキュメント操作オブジェクト #[]=( field_name, field_value )
-ドキュメント操作オブジェクト #field_name = field_value
+Mongous::Document#[]=( field_name, field_value )
+Mongous::Document#field_name = field_value
 ----
 
 * Result:

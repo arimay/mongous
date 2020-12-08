@@ -218,7 +218,7 @@ include Mongous::Document
 
 [source,ruby]
 ----
-self.client=( _client )
+self.client=( client )
 ----
 
 * Result:
@@ -226,6 +226,19 @@ self.client=( _client )
 
 * Parameter:
   ** client:          Mongo::Client instance.
+
+=== Get binded database.
+
+[source,ruby]
+----
+self.client
+----
+
+* Result:
+  ** Mongo::Client instance.
+
+* Parameter:
+  ** None.
 
 === Bind another collection.
 
@@ -240,11 +253,37 @@ self.collection_name=( _collection_name )
 * Parameter:
   ** collection_name: Collection name.
 
+=== Get binded collection name.
+
+[source,ruby]
+----
+self.collection_name
+----
+
+* Result:
+  ** Collection name string.
+
+* Parameter:
+  ** None.
+
+=== Get collection.
+
+[source,ruby]
+----
+self.collection( collection_name = nil )
+----
+
+* Result:
+  ** Mongo::Collection instance.
+
+* Parameter:
+  ** collection_name: Tempolary collection name.
+
 === Declare document structure.
 
 [source,ruby]
 ----
-field( symbol, *attrs, **items )
+self.field( symbol, *attrs, **items )
 ----
 
 * Parameter:
@@ -265,7 +304,7 @@ field( symbol, *attrs, **items )
 
 [source,ruby]
 ----
-verify( *directives, &block )
+self.verify( *directives, &block )
 ----
 
 * Parameter:
@@ -277,7 +316,7 @@ verify( *directives, &block )
 
 [source,ruby]
 ----
-index( *symbols, **options )
+self.index( *symbols, **options )
 ----
 
 * Parameter:
@@ -288,7 +327,7 @@ index( *symbols, **options )
 
 [source,ruby]
 ----
-having?( label )
+self.having?( label )
 ----
 
 * Result:
@@ -301,22 +340,38 @@ having?( label )
 
 [source,ruby]
 ----
-filter( symbol, filter_or_cond )
+self.filter( symbol, filter_or_cond )
 ----
 
 * Parameter:
   ** symbol:          Filter name.
   ** filter_or_cond:  Filter or search criteria.
 
+=== Select output fields.
+
+[source,ruby]
+----
+Mongous::Document.select( *keys, **kwargs )
+Mongous::Filter#select( *keys, **kwargs )
+----
+
+* Result:
+  ** Mongous::Filter instance.
+
+* Parameter:
+  ** keys:            Field symbols.
+  ** kwargs:          Field symbols and values.
+
 === Search condition.
 
 [source,ruby]
 ----
-Collection operate class #where( filter = nil, **conditions )
+Mongous::Document.where( filter = nil, **conditions )
+Mongous::Filter#where( filter = nil, **conditions )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filter:          Filter name symbol, or filter instance.
@@ -326,11 +381,12 @@ Collection operate class #where( filter = nil, **conditions )
 
 [source,ruby]
 ----
-Collection operate class #not( filter = nil, **conditions )
+Mongous::Document.not( filter = nil, **conditions )
+Mongous::Filter#not( filter = nil, **conditions )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filter:          Filter name symbol, or filter instance.
@@ -340,11 +396,12 @@ Collection operate class #not( filter = nil, **conditions )
 
 [source,ruby]
 ----
-Collection operate class #and( *filters )
+Mongous::Document.and( *filters )
+Mongous::Filter#and( *filters )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filters:         Filter name symbol, or filter instance.
@@ -353,20 +410,34 @@ Collection operate class #and( *filters )
 
 [source,ruby]
 ----
-Collection operate class #or( *filters )
+Mongous::Document.or( *filters )
+Mongous::Filter#or( *filters )
 ----
 
 * Result:
-  ** Filter instance.
+  ** Mongous::Filter instance.
 
 * Parameter:
   ** filters:         Field name symbol, or filter instance.
+
+=== Create document.
+
+[source,ruby]
+----
+Mongous::Document.create( **doc )
+----
+
+* Result:
+  ** nil.
+
+* Parameter:
+  ** doc:             Keyword arguments.
 
 === Save document.
 
 [source,ruby]
 ----
-Document operate object #save
+Mongous::Document#save
 ----
 
 * Result:
@@ -376,7 +447,7 @@ Document operate object #save
 
 [source,ruby]
 ----
-Document operate object #to_hash
+Mongous::Document#to_hash
 ----
 
 * Result:
@@ -386,7 +457,7 @@ Document operate object #to_hash
 
 [source,ruby]
 ----
-Document operate object #to_hash
+Mongous::Document#to_json
 ----
 
 * Result:
@@ -396,8 +467,8 @@ Document operate object #to_hash
 
 [source,ruby]
 ----
-Document operate object #[]( field_name )
-Document operate object #field_name
+Mongous::Document#[]( field_name )
+Mongous::Document#field_name
 ----
 
 * Result:
@@ -410,8 +481,8 @@ Document operate object #field_name
 
 [source,ruby]
 ----
-Document operate object #[]=( field_name, field_value )
-Document operate object #field_name = field_value
+Mongous::Document#[]=( field_name, field_value )
+Mongous::Document#field_name = field_value
 ----
 
 * Result:

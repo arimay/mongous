@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["arima.yasuhiro@gmail.com"]
 
   spec.summary       = %q{ Mongo wrapper library. }
-  spec.description   = %q{ Yet another lightweight mongo wrapper library. }
+  spec.description   = %q{ Yet another mongo wrapper library. }
   spec.homepage      = "https://github.com/arimay/mongous"
   spec.license       = "MIT"
 

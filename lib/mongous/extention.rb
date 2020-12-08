@@ -21,11 +21,11 @@ module Mongous
 
     def collection_name
       if self.class_variable_defined?( :@@collection_name )
-        self.class_variable_get( :@@collection_name )
-      else
-        _client_name  =  self.name
-        self.class_variable_set( :@@collection_name, _client_name )
+        value  =  self.class_variable_get( :@@collection_name )
+        return  value    if value
       end
+
+      self.class_variable_set( :@@collection_name, self.name )
     end
 
     def collection_name=( _collection_name )
@@ -35,14 +35,17 @@ module Mongous
       end
     end
 
-    def collection
-      if self.class_variable_defined?( :@@collection )
-        if  _collection  =  self.class_variable_get( :@@collection )
-          return  _collection
+    def collection( temp_collection_name = nil )
+      if  temp_collection_name.nil?
+        if self.class_variable_defined?( :@@collection )
+          if  _collection  =  self.class_variable_get( :@@collection )
+            return  _collection
+          end
         end
+        _collection_name  =  collection_name
+      else
+        _collection_name  =  temp_collection_name
       end
-
-      _collection_name  =  collection_name
       _client  =  client
 
       if  _client.database.collection_names.include?( _collection_name )
@@ -56,7 +59,8 @@ module Mongous
         _collection.indexes.create_one( keys, opts )    rescue  nil
       end
 
-      self.class_variable_set( :@@collection, _collection )
+      self.class_variable_set( :@@collection, _collection )    if temp_collection_name.nil?
+      _collection
     end
 
     def fields

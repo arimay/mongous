@@ -28,6 +28,10 @@ module Mongous
       self.collection.delete_many({})
     end
 
+    def attach( collection_name )
+      Filter.new( self ).attach( collection_name )
+    end
+
     def select( *keys, **hash )
       Filter.new( self ).select( *keys, **hash )
     end
@@ -91,6 +95,12 @@ module Mongous
       @option  =  {}
     end
 
+    def attach( collection_name )
+      w  =  self.dup
+      w.instance_variable_set( :@collection_name, collection_name.to_s )
+      w
+    end
+
     def where( conditions )
       hash  =  {}
       conditions.each do |key, item|
@@ -127,8 +137,9 @@ module Mongous
           end
         end
       end
-      @filter.merge!( hash )
-      self.dup
+      w  =  self.dup
+      w.instance_variable_set( :@filter, @filter.merge( hash ) )
+      w
     end
 
     def to_condition
@@ -136,42 +147,48 @@ module Mongous
     end
 
     def option( _option )
-      @option.merge!( _option )
-      self.dup
+      w  =  self.dup
+      w.instance_variable_set( :@option, @option.merge( _option ) )
+      w
     end
 
     def projection( *keys, **hash )
       if not keys.empty?
-        @projection  =  Hash[ keys.zip( Array.new(keys.length, 1) ) ]
+        _projection  =  Hash[ keys.zip( Array.new(keys.length, 1) ) ]
       elsif not hash.empty?
-        @projection  =  hash
+        _projection  =  hash
       else
-        @projection  =  nil
+        _projection  =  nil
       end
-      self.dup
+      w  =  self.dup
+      w.instance_variable_set( :@projection, _projection )
+      w
     end
     alias  :select  :projection
 
     def sort( *keys, **hash )
       if not keys.empty?
-        @sort  =  Hash[ keys.zip( Array.new( keys.length, 1 ) ) ]
+        _sort  =  Hash[ keys.zip( Array.new( keys.length, 1 ) ) ]
       elsif not hash.empty?
-        @sort  =  hash
+        _sort  =  hash
       else
-        @sort  =  nil
+        _sort  =  nil
       end
-      self.dup
+      w  =  self.dup
+      w.instance_variable_set( :@sort, _sort )
+      w
     end
     alias  :order  :sort
 
     def []( nth_or_range, len = nil )
       case  nth_or_range
       when  Integer
-        @skip  =  nth_or_range
+        _skip  =  nth_or_range
+        _limit  =  nil
 
         if  len
           raise  Mongous::Error, "invalid len. :  #{ len }"    if  !len.is_a? Integer || len <= 0
-          @limit  =  len
+          _limit  =  len
         end
 
       when  Range
@@ -182,22 +199,25 @@ module Mongous
         raise  Mongous::Error, "invalid range. :  #{ nth_or_range }"    unless  to.is_a? Integer
 
         to  -=  1    if nth_or_range.exclude_end?
-        @skip  =  from
-        @limit  =  to - from + 1
+        _skip  =  from
+        _limit  =  to - from + 1
 
       else
         raise  Mongous::Error, "invalid class. :  #{ nth_or_range }"
 
       end
 
-      self.dup
+      w  =  self.dup
+      w.instance_variable_set( :@skip, _skip )
+      w.instance_variable_set( :@limit, _limit )
+      w
     end
 
     def exec_query
       _filter  =  @filter
       _option  =  @option.dup
       _option[:projection]  =  @projection    if @projection
-      found  =  @klass.collection.find( _filter, _option )
+      found  =  @klass.collection( @collection_name ).find( _filter, _option )
       found  =  found.sort( @sort )    if  @sort
       found  =  found.skip( @skip )    if  @skip
       found  =  found.limit( @limit )    if  @limit
