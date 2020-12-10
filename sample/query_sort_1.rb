@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Item
-  include  Mongous::Document
-end
+Mongous.attach! :Item
 
 (0...10).each do |n|
   unless  Item.where( n: n ).first
@@ -29,17 +25,12 @@ Item.where.sort(n: -1).each do |item|
 end
 puts
 
-Item.where.order(n: -1).each do |item|
+Item.where( n: (3...8) ).sort(n: -1).each do |item|
   p item
 end
 puts
 
-Item.where( n: (3...8) ).order(n: -1).each do |item|
-  p item
-end
-puts
-
-Item.where( n: [0,2,4,6,8] ).order(n: -1).each do |item|
+Item.where( n: [0,2,4,6,8] ).sort(n: -1).each do |item|
   p item
 end
 puts

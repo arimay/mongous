@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Item
-  include  Mongous::Document
-end
+Mongous.attach! :Item
 
 (0...10).each do |n|
   unless  Item.where( n: n ).first
@@ -14,35 +10,48 @@ end
 end
 puts
 
+p "Item.each do |item|"
 Item.each do |item|
   p item
 end
 puts
 
+#Item.find.skip(2).limit(1).each do |item| p item; end; puts
+p "Item[2].each do |item|"
+Item[2].each do |item|
+  p item
+end
+puts
+
 #Item.find.skip(2).each do |item| p item; end; puts
-Item.where[2].each do |item|
+p "Item[2, 0].each do |item|"
+Item[2, 0].each do |item|
   p item
 end
 puts
 
 #Item.find.limit(3).each do |item| p item; end; puts
-Item.where[0,3].each do |item|
+p "Item[0, 3].each do |item|"
+Item[0, 3].each do |item|
   p item
 end
 puts
 
 #Item.find.skip(4).limit(5).each do |item| p item; end; puts
-Item.where[4,5].each do |item|
+p "Item[4, 5].each do |item|"
+Item[4, 5].each do |item|
   p item
 end
 puts
 
-Item.where[4..8].each do |item|
+p "Item[4..8].each do |item|"
+Item[4..8].each do |item|
   p item
 end
 puts
 
-Item.where[4...9].each do |item|
+p "Item[4...8].each do |item|"
+Item[4...8].each do |item|
   p item
 end
 puts

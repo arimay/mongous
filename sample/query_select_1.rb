@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Label
-  include  Mongous::Document
-end
+Mongous.attach! :Label
 
 (0...10).each do |n|
   unless  Label.where( n: n ).first

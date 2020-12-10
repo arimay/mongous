@@ -32,6 +32,10 @@ module Mongous
       Filter.new( self ).attach( collection_name )
     end
 
+    def []( nth_or_range, len = nil )
+      Filter.new( self )[ nth_or_range, len ]
+    end
+
     def select( *keys, **hash )
       Filter.new( self ).select( *keys, **hash )
     end
@@ -45,7 +49,7 @@ module Mongous
       raise  Mongous::Error, "Unset args for #{self}.not."    if filter.nil? && conditions.empty?
 
       condition  =  normalize( filter, conditions )
-      Filter.new( self ).where({"$nor" => [condition]})
+      Filter.new( self ).not( condition )
     end
 
     def and( *filters )
@@ -101,7 +105,7 @@ module Mongous
       w
     end
 
-    def where( conditions )
+    def build_condition( conditions )
       hash  =  {}
       conditions.each do |key, item|
         case  key
@@ -137,8 +141,20 @@ module Mongous
           end
         end
       end
+      hash
+    end
+
+    def where( conditions )
+      hash  =  build_condition( conditions )
       w  =  self.dup
       w.instance_variable_set( :@filter, @filter.merge( hash ) )
+      w
+    end
+
+    def not( conditions )
+      hash  =  build_condition( conditions )
+      w  =  self.dup
+      w.instance_variable_set( :@filter, @filter.merge( {"$nor" => [hash]} ) )
       w
     end
 
@@ -152,7 +168,7 @@ module Mongous
       w
     end
 
-    def projection( *keys, **hash )
+    def select( *keys, **hash )
       if not keys.empty?
         _projection  =  Hash[ keys.zip( Array.new(keys.length, 1) ) ]
       elsif not hash.empty?
@@ -164,7 +180,6 @@ module Mongous
       w.instance_variable_set( :@projection, _projection )
       w
     end
-    alias  :select  :projection
 
     def sort( *keys, **hash )
       if not keys.empty?
@@ -178,17 +193,20 @@ module Mongous
       w.instance_variable_set( :@sort, _sort )
       w
     end
-    alias  :order  :sort
 
     def []( nth_or_range, len = nil )
       case  nth_or_range
       when  Integer
         _skip  =  nth_or_range
-        _limit  =  nil
 
-        if  len
-          raise  Mongous::Error, "invalid len. :  #{ len }"    if  !len.is_a? Integer || len <= 0
+        if  len.is_a?(NilClass)
+          _limit  =  1
+        elsif  len.is_a?(Integer) && len == 0
+          _limit  =  nil
+        elsif  len.is_a?(Integer) && len > 0
           _limit  =  len
+        else
+          raise  Mongous::Error, "invalid len. :  #{ len }"
         end
 
       when  Range
