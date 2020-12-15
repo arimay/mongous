@@ -5,11 +5,6 @@ module Mongous
       self.collection.estimated_document_count
     end
 
-    def first
-      doc  =  self.collection.find.first
-      self.new( **doc )    if doc
-    end
-
     def all
       self.collection.find.map do |doc|
         self.new( **doc )
@@ -34,6 +29,14 @@ module Mongous
 
     def []( nth_or_range, len = nil )
       Filter.new( self )[ nth_or_range, len ]
+    end
+
+    def first
+      Filter.new( self ).first
+    end
+
+    def last
+      Filter.new( self ).last
     end
 
     def select( *keys, **hash )
@@ -265,7 +268,25 @@ module Mongous
     end
 
     def first
-      doc  =  exec_query.first
+      _filter  =  @filter
+      _option  =  @option.dup
+      _option[:projection]  =  @projection    if @projection
+      found  =  @klass.collection( @collection_name ).find( _filter, _option )
+      _order  =  @sort  ||  { _id: 1 }
+      doc  =  found.sort( _order ).first
+      @klass.new( **doc )    if doc
+    end
+
+    def last
+      _filter  =  @filter
+      _option  =  @option.dup
+      _option[:projection]  =  @projection    if @projection
+      found  =  @klass.collection( @collection_name ).find( _filter, _option )
+      _order  =  {}
+      ( @sort  ||  {_id: 1} ).each do |k,v|
+        _order[k]  =  - v
+      end
+      doc  =  found.sort( _order ).first
       @klass.new( **doc )    if doc
     end
 
