@@ -34,16 +34,16 @@ COUNT = 100000
 D0  =  Date.parse( "2020-01-01" )
 T0  =  D0.to_time
 
-Benchmark.bm 40 do |r|
+Benchmark.bm 40 do |bm|
   if COUNT !=  Card.count
     Card.delete
-    r.report "create #{COUNT}" do
+    bm.report "create #{COUNT}" do
       (0...COUNT).each do |i|
           f  =  i.to_f
           s  =  i.to_s
           d  =  D0 + i
           t  =  T0 + i
-          rn  =  rand
+          r  =  rand
           card  =  Card.create(
             i1: i,
             i2: i,
@@ -55,35 +55,35 @@ Benchmark.bm 40 do |r|
             d2: d,
             t1: t,
             t2: t,
-            r1: rn,
-            r2: rn,
+            r1: r,
+            r2: r,
           )
       end
     end
   end
 
-  r.report "first,  order by asc   without index" do
+  bm.report "first,  order by asc   without index" do
     Card.where.sort( r1: 1 ).first
   end
-  r.report "first,  order by desc  without index" do
+  bm.report "first,  order by desc  without index" do
     Card.where.sort( r1: -1 ).first
   end
-  r.report "top 10, order by asc   without index" do
+  bm.report "top 10, order by asc   without index" do
     Card.where.sort( r1: 1 )[0,10].all
   end
-  r.report "top 10, order by desc  without index" do
+  bm.report "top 10, order by desc  without index" do
     Card.where.sort( r1: -1 )[0,10].all
   end
-  r.report "first,  order by asc   with index" do
+  bm.report "first,  order by asc   with index" do
     Card.where.sort( r2: 1 ).first
   end
-  r.report "first,  order by desc  with index" do
+  bm.report "first,  order by desc  with index" do
     Card.where.sort( r2: -1 ).first
   end
-  r.report "top 10, order by asc   with index" do
+  bm.report "top 10, order by asc   with index" do
     Card.where.sort( r2: 1 )[0,10].all
   end
-  r.report "top 10, order by desc  with index" do
+  bm.report "top 10, order by desc  with index" do
     Card.where.sort( r2: -1 )[0,10].all
   end
 end

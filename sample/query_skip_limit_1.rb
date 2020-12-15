@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Item
-  include  Mongous::Document
-end
+Mongous.attach! :Item
 
 (0...10).each do |n|
   unless  Item.where( n: n ).first
@@ -14,33 +10,38 @@ end
 end
 puts
 
+p "count  =  Item.count"
 p count  =  Item.count
 puts
 
-p count  =  Item.where.count
+p "count  =  Item[0..4].count"
+p count  =  Item[0..4].count
 puts
 
-p count  =  Item.where[0..4].count
+p "count  =  Item[0...4].count"
+p count  =  Item[0...4].count
 puts
 
-p count  =  Item.where[0...4].count
+p "count  =  Item[0, 4].count"
+p count  =  Item[0, 4].count
 puts
 
-p count  =  Item.where[0, 4].count
+p "count  =  Item[5, 5].count"
+p count  =  Item[5, 5].count
 puts
 
-p count  =  Item.where[5, 5].count
+p "books  =  Item[0, 2].all"
+pp books  =  Item[0, 2].all
 puts
 
-pp books  =  Item.where[0, 2].all
-puts
-
-filter  =  Item.where
-filter[0, 4].each do |item|
+p "Item[0, 4].each do |item|"
+Item[0, 4].each do |item|
   p item
 end
 puts
-filter[4, 4].each do |item|
+
+p "Item[4, 4].each do |item|"
+Item[4, 4].each do |item|
   p item
 end
 puts

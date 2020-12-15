@@ -102,7 +102,8 @@ Book.create( **doc )
 ----
 pp books = Book.all
 
-p book = Book.where( title: "title 1" ).first
+p book = Book.where( title: /title/ ).first
+p book = Book.where( title: /title/ ).last
 
 books = Book.where( title: /title/ ).all
 books.each do |book|

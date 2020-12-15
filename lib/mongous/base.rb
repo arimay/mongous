@@ -50,7 +50,7 @@ module Mongous
       self.class_variable_set( :@@client, _client )
     end
 
-    def attach!( *names )
+    def document!( *names, **opts )
       raise  Mongous::Error, "missing argument."   if names.empty?
 
       names.each do |name|
@@ -72,13 +72,23 @@ module Mongous
           end
         end
 
-        Object.class_eval <<-CLASS
+        klass  =  Object.class_eval <<-CLASS
           class #{name}
             include Mongous::Document
           end
         CLASS
+
+        if opts[:timestamp]
+          klass.class_eval do
+            field  :created_at, Time, create: proc{ Time.now }
+            field  :updated_at, Time, update: proc{ Time.now }
+            index  :created_at
+            index  :updated_at
+          end
+        end
       end
     end
+    alias  :attach!  :document!
  
     def client
       if not self.class_variable_defined?( :@@client )
