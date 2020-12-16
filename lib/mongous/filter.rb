@@ -39,6 +39,10 @@ module Mongous
       Filter.new( self ).last
     end
 
+    def sort( *keys, **hash )
+      Filter.new( self ).sort( *keys, **hash )
+    end
+
     def select( *keys, **hash )
       Filter.new( self ).select( *keys, **hash )
     end
