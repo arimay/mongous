@@ -101,6 +101,10 @@ module Mongous
       self.new( **doc ).save
     end
 
+    def drop
+      self.collection.drop
+    end
+
     def find( conditios = {}, options = {} )
       self.collection.find( conditios, options )
     end
