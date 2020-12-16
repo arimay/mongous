@@ -1,7 +1,7 @@
 
 require "mongous"
 
-Mongous.attach!  :Book
+Mongous.document!  :Book
 
 Book.each do |book|
   p book

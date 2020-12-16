@@ -1,8 +1,6 @@
 
 require "mongous"
 
-Mongous.connect!
-
 class Book1
   include  Mongous::Document
 end

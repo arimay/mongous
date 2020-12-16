@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Book
-  include  Mongous::Document
-end
+Mongous.document!  :Book
 
 book  =  Book.new
 book.title  =  "title basic 1"

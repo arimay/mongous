@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
+Mongous.document!  :Item
 
-class Item
-  include  Mongous::Document
-end
-
-Item.where.delete
+Item.delete
 

@@ -1,7 +1,7 @@
 
 require "mongous"
 
-Mongous.attach! :Label
+Mongous.document!  :Label
 
 (0...10).each do |n|
   unless  Label.where( n: n ).first

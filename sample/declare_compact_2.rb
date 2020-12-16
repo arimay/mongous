@@ -16,7 +16,8 @@ Book1.each do |book|
 end
 puts
 
-#Book1.drop
+Book1.drop
+
 
 Mongous.document!  :Book2, timestamp: true
 
@@ -33,5 +34,5 @@ Book2.each do |book|
 end
 puts
 
-#Book2.drop
+Book2.drop
 

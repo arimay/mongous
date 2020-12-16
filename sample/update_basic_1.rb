@@ -1,11 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Book
-  include  Mongous::Document
-end
+Mongous.document!  :Book
 
 Book.where( title: /title/ ).each do |book|
   book.price  =  (book.price || 50 ) * 2

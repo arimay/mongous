@@ -1,7 +1,7 @@
 
 require "mongous"
 
-Mongous.attach! :Book
+Mongous.document!  :Book
 
 p "book  =  Book.find.first"
 p book  =  Book.find.first

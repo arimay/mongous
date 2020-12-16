@@ -1,7 +1,7 @@
 
 require "mongous"
 
-Mongous.attach! :Item
+Mongous.document!  :Item
 
 (0...10).each do |n|
   unless  Item.where( n: n ).first

@@ -1,9 +1,7 @@
 
 require "mongous"
 
-Mongous.connect!
-
-class Card
+class Plate
   include  Mongous::Document
   field :i1, Integer
   field :i2, Integer
@@ -35,8 +33,8 @@ D0  =  Date.parse( "2020-01-01" )
 T0  =  D0.to_time
 
 Benchmark.bm 40 do |bm|
-  if COUNT !=  Card.count
-    Card.delete
+  if COUNT !=  Plate.count
+    Plate.delete
     bm.report "create #{COUNT}" do
       (0...COUNT).each do |i|
           f  =  i.to_f
@@ -44,7 +42,7 @@ Benchmark.bm 40 do |bm|
           d  =  D0 + i
           t  =  T0 + i
           r  =  rand
-          card  =  Card.create(
+          card  =  Plate.create(
             i1: i,
             i2: i,
             f1: f,
@@ -63,28 +61,28 @@ Benchmark.bm 40 do |bm|
   end
 
   bm.report "first,  order by asc   without index" do
-    Card.where.sort( r1: 1 ).first
+    Plate.sort( r1: 1 ).first
   end
   bm.report "first,  order by desc  without index" do
-    Card.where.sort( r1: -1 ).first
+    Plate.sort( r1: -1 ).first
   end
   bm.report "top 10, order by asc   without index" do
-    Card.where.sort( r1: 1 )[0,10].all
+    Plate.sort( r1: 1 )[0,10].all
   end
   bm.report "top 10, order by desc  without index" do
-    Card.where.sort( r1: -1 )[0,10].all
+    Plate.sort( r1: -1 )[0,10].all
   end
-  bm.report "first,  order by asc   with index" do
-    Card.where.sort( r2: 1 ).first
+  bm.report "first,  order by asc   with    index" do
+    Plate.sort( r2: 1 ).first
   end
-  bm.report "first,  order by desc  with index" do
-    Card.where.sort( r2: -1 ).first
+  bm.report "first,  order by desc  with    index" do
+    Plate.sort( r2: -1 ).first
   end
-  bm.report "top 10, order by asc   with index" do
-    Card.where.sort( r2: 1 )[0,10].all
+  bm.report "top 10, order by asc   with    index" do
+    Plate.sort( r2: 1 )[0,10].all
   end
-  bm.report "top 10, order by desc  with index" do
-    Card.where.sort( r2: -1 )[0,10].all
+  bm.report "top 10, order by desc  with    index" do
+    Plate.sort( r2: -1 )[0,10].all
   end
 end
 
