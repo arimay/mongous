@@ -38,7 +38,7 @@ Or install it yourself as:
 ----
 require  "mongous"
 
-Mongous.attach!  :Book
+Mongous.document!  :Book
 ----
 
 === Detail declaration
@@ -199,7 +199,7 @@ Mongous.connect( hosts_or_uri = nil, **options )
 
 [source,ruby]
 ----
-Mongous.attach!( *names )
+Mongous.document!( *names, **options )
 ----
 
 * Result:
@@ -207,6 +207,8 @@ Mongous.attach!( *names )
 
 * Parameter:
   ** names:           Collection names. (String or Symbol)
+  ** options:         Options.
+    *** timestamp:    If true then add fields :created_at, :updated_at.
 
 === Include document functions into collection operate class.
 

@@ -38,7 +38,7 @@ gem 'mongous'
 ----
 require  "mongous"
 
-Mongous.attach!  :Book
+Mongous.document!  :Book
 ----
 
 === 詳細な定義
@@ -199,7 +199,7 @@ Mongous.connect( hosts_or_uri = nil, **options )
 
 [source,ruby]
 ----
-Mongous.attach!( *names )
+Mongous.document!( *names, **options )
 ----
 
 * Result:
@@ -207,6 +207,8 @@ Mongous.attach!( *names )
 
 * Parameter:
   ** names:           コレクション名. (String または Symbol)
+  ** options:         オプション
+    *** timestamp:    真のとき, フィールド :created_at, :updated_at を追加する.
 
 === コレクション操作クラスにドキュメントの機能を取り入れる.
 
