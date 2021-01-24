@@ -7,7 +7,7 @@ class Book
   field  :title,                :must
   field  :author
   field  :publisher
-  field  :style,                %w[hardcover, softcover, paperback]
+  field  :style,                %w[hardcover softcover paperback]
   field  :size,                 /[AB]\d/
   field  :price,      Integer,  (0..1_000_000)
   field  :page,       Integer,  proc{ page > 0 }

@@ -5,18 +5,18 @@ module Mongous
       if self.class_variable_defined?( :@@client )
         self.class_variable_get( :@@client )
       else
-        _client  =  Mongous.client
-        self.class_variable_set( :@@client, _client )
+        new_client  =  Mongous.client
+        self.class_variable_set( :@@client, new_client )
       end
     end
 
-    def client=( _client )
-      m  =  /(.*?):(\d+)/.match( caller()[0] )
-      call_from  =  [ m[1], m[2] ].join(":")
-      if  !_client.is_a?( Mongo::Client )
-        raise  Mongous::Error, "type invalid. :  #{ _client }"
+    def client=( new_client )
+      if  !new_client.is_a?( Mongo::Client )
+        m  =  /(.*?):(\d+)/.match( caller()[0] )
+        call_from  =  [ m[1], m[2] ].join(":")
+        raise  Mongous::Error, "type invalid. :  #{ new_client } at #{ call_from }"
       end
-      self.class_variable_set( :@@client, _client )
+      self.class_variable_set( :@@client, new_client )
     end
 
     def collection_name
@@ -28,8 +28,8 @@ module Mongous
       self.class_variable_set( :@@collection_name, self.name )
     end
 
-    def collection_name=( _collection_name )
-      self.class_variable_set( :@@collection_name, _collection_name )
+    def collection_name=( new_collection_name )
+      self.class_variable_set( :@@collection_name, new_collection_name )
       if self.class_variable_defined?( :@@collection )
         self.remove_class_variable( :@@collection )
       end
@@ -38,29 +38,29 @@ module Mongous
     def collection( temp_collection_name = nil )
       if  temp_collection_name.nil?
         if self.class_variable_defined?( :@@collection )
-          if  _collection  =  self.class_variable_get( :@@collection )
-            return  _collection
+          if ( new_collection  =  self.class_variable_get( :@@collection ) )
+            return  new_collection
           end
         end
-        _collection_name  =  collection_name
+        new_collection_name  =  collection_name
       else
-        _collection_name  =  temp_collection_name
+        new_collection_name  =  temp_collection_name
       end
-      _client  =  client
+      new_client  =  client
 
-      if  _client.database.collection_names.include?( _collection_name )
-        _collection  =  _client[ _collection_name ]
+      if  new_client.database.collection_names.include?( new_collection_name )
+        new_collection  =  new_client[ new_collection_name ]
       else
-        _collection  =  _client[ _collection_name ]
-        _collection.create
+        new_collection  =  new_client[ new_collection_name ]
+        new_collection.create
       end
 
       indexes.each do |keys, opts|
-        _collection.indexes.create_one( keys, opts )    rescue  nil
+        new_collection.indexes.create_one( keys, opts )    rescue  nil
       end
 
-      self.class_variable_set( :@@collection, _collection )    if temp_collection_name.nil?
-      _collection
+      self.class_variable_set( :@@collection, new_collection )    if temp_collection_name.nil?
+      new_collection
     end
 
     def fields
@@ -114,7 +114,7 @@ module Mongous
       call_from  =  [ m[1], m[2] ].join(":")
 
       attrs.each do |attr|
-        if klass  =  attr.class 
+        if ( klass  =  attr.class )
           if ![Class, Range, Array, Regexp, Proc, Symbol].include?(klass)
             raise  Mongous::Error, "'field' arguments error. : #{ attr } on #{ symbol } at #{ call_from }"
           end

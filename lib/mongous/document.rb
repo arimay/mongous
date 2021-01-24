@@ -15,7 +15,7 @@ module Mongous
       end
     end
 
-    def method_missing( sym, *args, **opts, &block )
+    def method_missing( sym, *args, **_opts, &_block )
       m  =  /\A(\w+)([=])?\Z/.match( sym.to_s )
       if  args.size == 0 && m[2].nil?
         self[ m[1] ]
@@ -55,12 +55,12 @@ module Mongous
 
       self.class.fields.each do |label, field|
         default_value  =  getvalue_or_callproc( field[:default] )
-        _must  =  field[:_attrs].include?(:must)
+        must  =  field[:_attrs].include?(:must)
         if  @doc.has_key?(label)
           if  !having?( @doc[label] )
             if  default_value
               self[label]  =  default_value
-            elsif  _must
+            elsif  must
               raise  Mongous::Error, "must but unassigned field. : #{ label }"
             elsif  self.class.symbols[:strict]
               self[label]  =  nil
@@ -69,7 +69,7 @@ module Mongous
         else
           if  default_value
             self[label]  =  default_value
-          elsif  _must
+          elsif  must
             raise  Mongous::Error, "must but unassigned field. : #{ label }"
           elsif  self.class.symbols[:strict]
             self[label]  =  nil
@@ -78,11 +78,11 @@ module Mongous
 
         case  savemode
         when  :create
-          if  create_value  =  getvalue_or_callproc( field[:create] )
+          if ( create_value  =  getvalue_or_callproc( field[:create] ) )
             self[label]  =  create_value
           end
         when  :update
-          if  update_value  =  getvalue_or_callproc( field[:update] )
+          if ( update_value  =  getvalue_or_callproc( field[:update] ) )
             self[label]  =  update_value
           end
         end
@@ -107,8 +107,8 @@ module Mongous
       @doc.dup
     end
 
-    def to_json
-      @doc.to_json
+    def to_json( **opts )
+      ::JSON.generate( @doc, **opts )
     end
 
     def []( label )
@@ -144,10 +144,13 @@ module Mongous
       end
 
       field  =  self.class.fields[label]
-      return  @doc[label]  =  value    if field.nil?
+      if field.nil?
+        @doc[label]  =  value
+        return
+      end
 
       types  =  []
-      if  attrs  =  field[:_attrs]  ||  []
+      if ( attrs  =  field[:_attrs]  ||  [] )
         attrs.each do |attr|
           if  attr.class == Class
             types  <<  attr

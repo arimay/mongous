@@ -78,18 +78,18 @@ module Mongous
     end
 
     def normalize( filter, conditions )
-      condition  =  case  filter
+      case  filter
       when  Filter
         filter.to_condition
       when  Symbol
-        case  _filter  =  filters[filter]
+        case  ( new_filter  =  filters[filter] )
         when  Filter
-          _filter.to_condition
+          new_filter.to_condition
         when  Hash
-          _filter
+          new_filter
         end
       when  NilClass
-        Filter.new( self ).where( **conditions ).to_condition
+        Filter.new( self ).where( conditions ).to_condition
       else
         caller_method  =  /`(.*?)'/.match( caller()[0] )[1]
         raise  Mongous::Error, "Invalid args for #{self}.#{ caller_method }. : #{filter}, #{conditions}"
@@ -125,17 +125,17 @@ module Mongous
             hash[key]  =  {"$in"=>item}
 
           when  Range
-            _begin_oper  =  "$gte"
-            _end_oper  =  item.exclude_end?  ?  "$lt"  :  "$lte"
+            begin_oper  =  "$gte"
+            end_oper  =  item.exclude_end?  ?  "$lt"  :  "$lte"
 
             if      item.begin  &&   item.end
-              hash[key]  =  { _begin_oper => item.begin, _end_oper => item.end }
+              hash[key]  =  { begin_oper => item.begin, end_oper => item.end }
 
             elsif  !item.begin  &&   item.end
-              hash[key]  =  { _end_oper => item.end }
+              hash[key]  =  { end_oper => item.end }
 
             elsif   item.begin  &&  !item.end
-              hash[key]  =  { _begin_oper => item.begin }
+              hash[key]  =  { begin_oper => item.begin }
 
             else
               raise  Mongous::Error, "invalid range. :  #{ item }"
@@ -151,14 +151,14 @@ module Mongous
       hash
     end
 
-    def where( conditions )
+    def where( conditions = {} )
       hash  =  build_condition( conditions )
       w  =  self.dup
       w.instance_variable_set( :@filter, @filter.merge( hash ) )
       w
     end
 
-    def not( conditions )
+    def not( conditions = {} )
       hash  =  build_condition( conditions )
       w  =  self.dup
       w.instance_variable_set( :@filter, @filter.merge( {"$nor" => [hash]} ) )
@@ -169,49 +169,49 @@ module Mongous
       @filter.dup
     end
 
-    def option( _option )
+    def option( new_option )
       w  =  self.dup
-      w.instance_variable_set( :@option, @option.merge( _option ) )
+      w.instance_variable_set( :@option, @option.merge( new_option ) )
       w
     end
 
     def select( *keys, **hash )
       if not keys.empty?
-        _projection  =  Hash[ keys.zip( Array.new(keys.length, 1) ) ]
+        new_projection  =  Hash[ keys.zip( Array.new(keys.length, 1) ) ]
       elsif not hash.empty?
-        _projection  =  hash
+        new_projection  =  hash
       else
-        _projection  =  nil
+        new_projection  =  nil
       end
       w  =  self.dup
-      w.instance_variable_set( :@projection, _projection )
+      w.instance_variable_set( :@projection, new_projection )
       w
     end
 
     def sort( *keys, **hash )
       if not keys.empty?
-        _sort  =  Hash[ keys.zip( Array.new( keys.length, 1 ) ) ]
+        new_sort  =  Hash[ keys.zip( Array.new( keys.length, 1 ) ) ]
       elsif not hash.empty?
-        _sort  =  hash
+        new_sort  =  hash
       else
-        _sort  =  nil
+        new_sort  =  nil
       end
       w  =  self.dup
-      w.instance_variable_set( :@sort, _sort )
+      w.instance_variable_set( :@sort, new_sort )
       w
     end
 
     def []( nth_or_range, len = nil )
       case  nth_or_range
       when  Integer
-        _skip  =  nth_or_range
+        new_skip  =  nth_or_range
 
         if  len.is_a?(NilClass)
-          _limit  =  1
+          new_limit  =  1
         elsif  len.is_a?(Integer) && len == 0
-          _limit  =  nil
+          new_limit  =  nil
         elsif  len.is_a?(Integer) && len > 0
-          _limit  =  len
+          new_limit  =  len
         else
           raise  Mongous::Error, "invalid len. :  #{ len }"
         end
@@ -224,8 +224,8 @@ module Mongous
         raise  Mongous::Error, "invalid range. :  #{ nth_or_range }"    unless  to.is_a? Integer
 
         to  -=  1    if nth_or_range.exclude_end?
-        _skip  =  from
-        _limit  =  to - from + 1
+        new_skip  =  from
+        new_limit  =  to - from + 1
 
       else
         raise  Mongous::Error, "invalid class. :  #{ nth_or_range }"
@@ -233,16 +233,16 @@ module Mongous
       end
 
       w  =  self.dup
-      w.instance_variable_set( :@skip, _skip )
-      w.instance_variable_set( :@limit, _limit )
+      w.instance_variable_set( :@skip, new_skip )
+      w.instance_variable_set( :@limit, new_limit )
       w
     end
 
     def exec_query
-      _filter  =  @filter
-      _option  =  @option.dup
-      _option[:projection]  =  @projection    if @projection
-      found  =  @klass.collection( @collection_name ).find( _filter, _option )
+      new_filter  =  @filter
+      new_option  =  @option.dup
+      new_option[:projection]  =  @projection    if @projection
+      found  =  @klass.collection( @collection_name ).find( new_filter, new_option )
       found  =  found.sort( @sort )    if  @sort
       found  =  found.skip( @skip )    if  @skip
       found  =  found.limit( @limit )    if  @limit
@@ -253,44 +253,44 @@ module Mongous
       found  =  @klass.collection.find( @filter )
       found  =  found.skip( @skip )    if  @skip
       found  =  found.limit( @limit )    if  @limit
-      _count  =  found.count_documents
+      new_count  =  found.count_documents
       if  @skip
-        if  @skip > _count
+        if  @skip > new_count
           0
         elsif  @limit
-          [_count - @skip, @limit].min
+          [new_count - @skip, @limit].min
         else
-          _count - @skip
+          new_count - @skip
         end
       else
         if  @limit
-          [_count, @limit].min
+          [new_count, @limit].min
         else
-          _count
+          new_count
         end
       end
     end
 
     def first
-      _filter  =  @filter
-      _option  =  @option.dup
-      _option[:projection]  =  @projection    if @projection
-      found  =  @klass.collection( @collection_name ).find( _filter, _option )
-      _order  =  @sort  ||  { _id: 1 }
-      doc  =  found.sort( _order ).first
+      new_filter  =  @filter
+      new_option  =  @option.dup
+      new_option[:projection]  =  @projection    if @projection
+      found  =  @klass.collection( @collection_name ).find( new_filter, new_option )
+      new_order  =  @sort  ||  { _id: 1 }
+      doc  =  found.sort( new_order ).first
       @klass.new( **doc )    if doc
     end
 
     def last
-      _filter  =  @filter
-      _option  =  @option.dup
-      _option[:projection]  =  @projection    if @projection
-      found  =  @klass.collection( @collection_name ).find( _filter, _option )
-      _order  =  {}
+      new_filter  =  @filter
+      new_option  =  @option.dup
+      new_option[:projection]  =  @projection    if @projection
+      found  =  @klass.collection( @collection_name ).find( new_filter, new_option )
+      new_order  =  {}
       ( @sort  ||  {_id: 1} ).each do |k,v|
-        _order[k]  =  - v
+        new_order[k]  =  - v
       end
-      doc  =  found.sort( _order ).first
+      doc  =  found.sort( new_order ).first
       @klass.new( **doc )    if doc
     end
 

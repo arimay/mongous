@@ -11,7 +11,7 @@ module Mongous
     def connect( hosts_or_uri = nil, file: nil, mode: nil, loglevel: nil, **options )
       case  hosts_or_uri
       when  Array, String
-        ;
+        hosts_or_uri
 
       when  NilClass
         if file
@@ -46,8 +46,8 @@ module Mongous
     end
 
     def connect!( hosts_or_uri = nil, **options )
-      _client  =  connect( hosts_or_uri, **options )
-      self.class_variable_set( :@@client, _client )
+      client_  =  connect( hosts_or_uri, **options )
+      self.class_variable_set( :@@client, client_ )
     end
 
     def document!( *names, **opts )
@@ -56,6 +56,7 @@ module Mongous
       names.each do |name|
         case  name
         when  String
+          name
         when  Symbol
           name  =  name.to_s
         else
@@ -97,11 +98,11 @@ module Mongous
       self.class_variable_get( :@@client )
     end
 
-    def client=( _client )
-      if not _client.is_a?( ::Mongo::Client )
-        raise  Mongous::Error, "type invalid. :  #{ _client }"
+    def client=( new_client )
+      if not new_client.is_a?( ::Mongo::Client )
+        raise  Mongous::Error, "type invalid. :  #{ new_client }"
       end
-      self.class_variable_set( :@@client, _client )
+      self.class_variable_set( :@@client, new_client )
     end
 
     def loger
