@@ -22,8 +22,8 @@ pp books  =  Book.where( title: /title/ ).all
 puts
 
 p "Book.where( title: /title/ ).each do |book|"
-Book.where( title: /title/ ).each do |book|
-  p book
+Book.where( title: /title/ ).each do |a_book|
+  p a_book
 end
 puts
 

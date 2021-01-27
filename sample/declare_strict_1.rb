@@ -43,7 +43,7 @@ book.isbn        =  "978-3-16-148410-0"
 book.save
 
 
-Book.each do |book|
-  pp book
+Book.each do |a_book|
+  pp a_book
 end
 

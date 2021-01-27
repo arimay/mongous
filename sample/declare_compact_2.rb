@@ -11,8 +11,8 @@ book  =  Book1.where( title: "book1" ).first
 book.author      =  "alice"
 book.save
 
-Book1.each do |book|
-  pp book
+Book1.each do |a_book|
+  pp a_book
 end
 puts
 
@@ -29,8 +29,8 @@ book  =  Book2.where( title: "book2" ).first
 book.author      =  "bob"
 book.save
 
-Book2.each do |book|
-  pp book
+Book2.each do |a_book|
+  pp a_book
 end
 puts
 

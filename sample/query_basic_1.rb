@@ -22,8 +22,8 @@ pp books  =  Book.all
 puts
 
 p "Book.each do |book|"
-Book.each do |book|
-  p book
+Book.each do |a_book|
+  p a_book
 end
 puts
 

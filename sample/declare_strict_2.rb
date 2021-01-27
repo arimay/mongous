@@ -24,9 +24,9 @@ class Book
 end
 
 
-Book.each do |book|
+Book.each do |a_book|
   begin
-    pp book
+    pp a_book
     book.save     # cause exception when detected violation.
   rescue => e
     p e.message
