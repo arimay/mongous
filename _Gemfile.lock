@@ -1,0 +1,38 @@
+PATH
+  remote: .
+  specs:
+    mongous (0.4.3)
+      mongo
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    bson (4.11.1)
+    diff-lcs (1.4.4)
+    mongo (2.14.0)
+      bson (>= 4.8.2, < 5.0.0)
+    rake (13.0.3)
+    rspec (3.10.0)
+      rspec-core (~> 3.10.0)
+      rspec-expectations (~> 3.10.0)
+      rspec-mocks (~> 3.10.0)
+    rspec-core (3.10.1)
+      rspec-support (~> 3.10.0)
+    rspec-expectations (3.10.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-mocks (3.10.1)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.10.0)
+    rspec-support (3.10.1)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  mongous!
+  rake
+  rspec
+
+BUNDLED WITH
+   2.2.6
