@@ -10,6 +10,7 @@
 * ドキュメントの項目値設定時に制約条件を満たすか検査する.
 * ドキュメントの未定義項目の内容を値または Proc で記述できる.
 * ドキュメント作成時および更新時の項目内容を値または Proc で記述できる.
+* クラス名に対応するデータベースのコレクション名は、複数形へ変換しない.
 
 == 導入
 
@@ -55,7 +56,7 @@ class Book
   field  :title,      String,   :must
   field  :author,     String
   field  :publisher,  String
-  field  :style,      String,   %w[hardcover, softcover, paperback]
+  field  :style,      String,   %w[hardcover softcover paperback]
   field  :size,       String,   /[AB]\d/
   field  :price,      Integer,  (0..1_000_000)
   field  :page,       Integer,  proc{ page % 4 == 0 }

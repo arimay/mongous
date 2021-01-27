@@ -10,6 +10,7 @@ Yet another mongo wrapper library.
 * Check if the constraint condition is satisfied when setting the item value of the document.
 * The contents of undefined items in the document can be described by value or Proc.
 * Item contents at the time of document creation and update can be described by value or Proc.
+* The database collection name corresponding to the class name is not converted to the plural form.
 
 == Installation
 
@@ -55,7 +56,7 @@ class Book
   field  :title,      String,   :must
   field  :author,     String
   field  :publisher,  String
-  field  :style,      String,   %w[hardcover, softcover, paperback]
+  field  :style,      String,   %w[hardcover softcover paperback]
   field  :size,       String,   /[AB]\d/
   field  :price,      Integer,  (0..1_000_000)
   field  :page,       Integer,  proc{ page % 4 == 0 }
